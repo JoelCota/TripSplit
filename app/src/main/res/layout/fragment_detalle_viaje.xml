@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lightGray"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+         <!-- Encabezado redondo-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:background="@drawable/gradient_title"
+            android:gravity="center"
+            android:padding="16dp"
+            android:orientation="horizontal">
+
+            <!-- Titulo-->
+            <TextView
+                android:id="@+id/txtTituloViaje"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Cocorit"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"/>
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/imagen1"/>
+        </LinearLayout>
+
+        <!-- text Total gastado-->
+        <TextView
+            android:id="@+id/txtTotalGastado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Han gastado: $110.00"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="12dp">
+
+            <!-- Boton de grafica -->
+            <Button
+                android:id="@+id/btnGrafica"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Gráfica por categoría"
+                android:textSize="13sp"
+                android:backgroundTint="#673AB7"
+                android:textColor="@android:color/white"
+                android:padding="10dp"
+                android:layout_marginEnd="6dp"/>
+
+            <!-- Boton Listado gastos totales  -->
+            <Button
+                android:id="@+id/btnListadoGastos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Listado gastos totales"
+                android:textSize="13sp"
+                android:backgroundTint="#673AB7"
+                android:textColor="@android:color/white"
+                android:padding="10dp"
+                android:layout_marginEnd="6dp"/>
+
+            <!-- Boton Listado de saldos  -->
+            <Button
+                android:id="@+id/btnSaldos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Saldos pendientes"
+                android:textSize="13sp"
+                android:backgroundTint="#673AB7"
+                android:textColor="@android:color/white"
+                android:padding="10dp"/>
+
+        </LinearLayout>
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChart"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/white"/>
+
+        <TextView
+            android:id="@+id/textViewGastosTotales"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gastos totales aquí"
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/textViewSaldosPendientes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Saldos pendientes:\n\nJuan Daniel Castro debe MX$200.00 a Diego Hernandez\nDiego Hernandez debe MX$150.00 a Joel Lopez Cota\nJoel Lopez Cota debe MX$50.00 a Juan Daniel Castro"
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</LinearLayout>

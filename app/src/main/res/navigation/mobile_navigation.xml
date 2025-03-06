@@ -4,4 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/cuentaFragment"
+        android:name="org.itson.tripsplit.CuentaFragment"
+        android:label="Cuenta">
+        <action
+            android:id="@+id/action_cuentaFragment_to_detalleViajeFragment"
+            app:destination="@id/detalleViajeFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/detalleViajeFragment"
+        android:name="org.itson.tripsplit.DetalleViajeFragment"
+        android:label="Detalle Viaje"/>
 </navigation>
