@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    android:background="@android:color/white">
+
+    <!-- Imagen superior -->
+
+    <!-- Texto principal -->
+    <ImageView
+        android:id="@+id/info_image"
+        android:layout_width="wrap_content"
+        android:layout_height="371dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/imagen1" />
+
+    <TextView
+        android:id="@+id/info_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="¡Viajar juntos nunca fue tan fácil!"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:textColor="@android:color/black" />
+
+    <!-- Texto secundario -->
+    <TextView
+        android:id="@+id/info_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Divide los gastos del viaje sin complicaciones y disfruta la aventura sin preocupaciones"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:paddingBottom="24dp"
+        android:textColor="@android:color/darker_gray" />
+
+    <!-- Botón -->
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Comenzar"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/purple"
+        android:padding="10dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>
