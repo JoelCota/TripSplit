@@ -7,16 +7,17 @@
     android:background="@color/lightGray"
     android:orientation="vertical"
     android:paddingTop="25dp"
-    tools:context=".MainActivity">
+    tools:context=".fragments.NuevoGastoFragment">
 
+    <!-- Contenedor del título -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_margin="10dp"
+        android:layout_height="@dimen/activity_tittle_box_vertical"
+        android:layout_margin="14dp"
         android:background="@drawable/gradient_title"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
         android:paddingEnd="16dp">
 
         <!-- Botón de Cancelar (X) -->
@@ -24,117 +25,143 @@
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="10dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="Cancelar"
-            android:paddingTop="25dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
-        <!-- Título centrado -->
-        <TextView
-            android:id="@+id/tittle"
-            android:layout_width="wrap_content"
+        <!-- Spinner para seleccionar el título -->
+        <Spinner
+            android:id="@+id/spinnerTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
             android:fontFamily="@font/inter"
-            android:text="Viaje a San Carlos"
-            android:textColor="@android:color/white"
+            android:textColor="@android:color/black"
             android:textSize="32sp"
             android:textStyle="bold" />
-
     </LinearLayout>
 
-
-    <!-- Contenido principal -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="10dp"
-        android:layout_weight="1"
         android:background="@drawable/box_content"
         android:gravity="top"
         android:orientation="vertical"
         android:padding="16dp">
 
-
         <!-- GridLayout con 2 columnas -->
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
             android:columnCount="2"
             android:orientation="horizontal"
             android:padding="8dp"
             android:rowCount="3">
 
-            <!-- Columna izquierda: Botones de Categoría y Divisa -->
+            <!-- Categoría -->
             <Button
                 android:id="@+id/btnSelectCategory"
                 android:layout_width="75dp"
                 android:layout_height="75dp"
                 android:layout_margin="5dp"
-                android:text="Cat"
-                android:textSize="10sp" />
+                android:background="@drawable/category"
+                android:contentDescription="Seleccionar Categoría" />
 
-
-            <!-- Columna derecha: Campos de Nombre y Cantidad -->
             <EditText
-                android:id="@+id/edtExpenseName"
+                android:id="@+id/edtGasto"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_marginLeft="10dp"
                 android:hint="Nombre del Gasto"
                 android:inputType="text"
-                android:padding="8dp" />
+                android:padding="16dp" />
 
+            <!-- Moneda -->
             <Button
                 android:id="@+id/btnSelectCurrency"
                 android:layout_width="75dp"
                 android:layout_height="75dp"
                 android:layout_margin="5dp"
-                android:text="Div"
-                android:textSize="10sp" />
+                android:background="@drawable/attach_money"
+                android:contentDescription="Seleccionar Moneda" />
 
             <EditText
-                android:id="@+id/edtAmount"
+                android:id="@+id/edtCantidad"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_marginLeft="10dp"
                 android:hint="Cantidad"
                 android:inputType="numberDecimal"
-                android:padding="8dp" />
-
+                android:padding="16dp" />
         </GridLayout>
-        <!-- Texto "Pagado por ti y dividido entre todos" -->
-        <TextView
-            android:id="@+id/txtPagadoDividido"
+
+        <!-- Mostrar moneda y categoría seleccionadas -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pagado por ti y dividido entre todos"
-            android:textSize="16sp"
-            android:textColor="@android:color/black"
+            android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="10dp">
 
-        <!-- Botón Guardar centrado -->
+            <TextView
+                android:id="@+id/txtMoneda"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Moneda: USD"
+                android:textSize="12sp"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/txtCategoria"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Categoría: Comida"
+                android:textSize="12sp"
+                android:textColor="@android:color/black"
+                android:layout_marginStart="20dp" />
+        </LinearLayout>
+
+        <!-- Pagado por y Dividido entre -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/txtPagadoPor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pagado por ti "
+                android:textSize="12sp"
+                android:textColor="@android:color/black"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/txtDivididoEntre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="y dividido entre todos"
+                android:textSize="12sp"
+                android:textColor="@android:color/black"
+                android:clickable="true"
+                android:focusable="true"/>
+        </LinearLayout>
+
+        <!-- Botón de Guardar -->
         <Button
             android:id="@+id/btnGuardar"
             android:layout_width="250dp"
             android:layout_height="50dp"
             android:layout_marginBottom="8dp"
             android:backgroundTint="@color/purple"
-            android:gravity="center"
             android:text="Guardar"
-            android:layout_margin="45dp"
             android:textColor="@android:color/white"
-            android:layout_gravity="center" />
-
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginTop="20dp" />
     </LinearLayout>
 
 </LinearLayout>

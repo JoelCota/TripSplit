@@ -1,17 +1,19 @@
-package org.itson.tripsplit
+package org.itson.tripsplit.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import org.itson.tripsplit.R
 
-class UnirseGrupoFragment : Fragment() {
+class CuentaFragment : Fragment() {
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_unirse_grupo, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_cuenta, container, false)
 
         return rootView
     }

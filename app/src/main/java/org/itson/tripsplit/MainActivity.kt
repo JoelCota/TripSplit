@@ -5,6 +5,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import org.itson.tripsplit.fragments.CuentaFragment
+import org.itson.tripsplit.fragments.GruposFragment
+import org.itson.tripsplit.fragments.NuevoGastoFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

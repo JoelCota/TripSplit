@@ -1,9 +1,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme -->
     <style name="Base.Theme.TripSplit" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+        <!-- Personaliza el color del botón y los elementos relacionados -->
+        <item name="colorPrimary">@color/purple</item> <!-- Color principal -->
+        <item name="colorOnPrimary">@android:color/white</item> <!-- Color del texto en los botones -->
 
+        <!-- Para cambiar el color de los botones en el tema -->
+        <item name="colorSurface">@android:color/black</item>  <!-- Fondo de los botones -->
+
+        <!-- Otros colores que puedas necesitar -->
+        <item name="colorSecondary">@color/purple</item>
+        <item name="colorOnSecondary">@android:color/black</item>
+    </style>
+    <style name="CustomSpinnerText">
+        <item name="android:fontFamily">@font/inter</item> <!-- Fuente personalizada -->
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">32sp</item> <!-- Tamaño del texto -->
+        <item name="android:textStyle">bold</item> <!-- Estilo en negritas -->
+    </style>
     <style name="Theme.TripSplit" parent="Base.Theme.TripSplit" />
 </resources>
