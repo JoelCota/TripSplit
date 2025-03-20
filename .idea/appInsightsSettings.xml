@@ -9,10 +9,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="org.itson.tripsplit" />
+                  <option name="mobileSdkAppId" value="1:369147172169:android:b0f875334e00a38f6e7698" />
+                  <option name="projectId" value="tripsplit-fc585" />
+                  <option name="projectNumber" value="369147172169" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

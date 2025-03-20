@@ -9,7 +9,6 @@
     android:paddingTop="25dp"
     tools:context=".fragments.NuevoGastoFragment">
 
-    <!-- Contenedor del título -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/activity_tittle_box_vertical"
@@ -20,7 +19,6 @@
         android:paddingStart="20dp"
         android:paddingEnd="16dp">
 
-        <!-- Botón de Cancelar (X) -->
         <ImageButton
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
@@ -29,7 +27,6 @@
             android:contentDescription="Cancelar"
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
-        <!-- Spinner para seleccionar el título -->
         <Spinner
             android:id="@+id/spinnerTitle"
             android:layout_width="match_parent"

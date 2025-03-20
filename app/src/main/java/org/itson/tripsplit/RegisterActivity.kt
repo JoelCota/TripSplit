@@ -143,11 +143,7 @@ class RegisterActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Log.d("INFO", "signInWithEmail:success")
-                    val user = auth.currentUser
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.putExtra("user", email)
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    val intent = Intent(this, LoginActivity::class.java)
                     startActivity(intent)
                 } else {
                     Log.w("ERROR", "signInWithEmail:failure", task.exception)
