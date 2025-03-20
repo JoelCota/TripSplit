@@ -2,13 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/lightGray"
     android:orientation="vertical"
+    android:background="@color/lightGray"
     android:paddingTop="25dp"
-    tools:context=".RegisterActivity">
+    tools:context=".RegisterActivity"
+    android:id="@+id/main">
 
     <!-- Encabezado con Gradiente -->
     <LinearLayout
@@ -25,7 +25,8 @@
             android:text="Crear Cuenta"
             android:textColor="@android:color/white"
             android:textSize="32sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            />
     </LinearLayout>
 
     <!-- Contenido principal -->
@@ -52,8 +53,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
             android:hint="Nombre completo"
-            android:inputType="text"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:inputType="text"/>
 
 
         <!-- Correo -->
@@ -72,8 +73,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
             android:hint="correo@direccion.com"
-            android:inputType="text"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:inputType="text"/>
 
         <!-- Contraseña -->
         <TextView
@@ -91,8 +92,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
             android:hint="************"
-            android:inputType="textPassword"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:inputType="textPassword"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -109,26 +110,24 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
             android:hint="************"
-            android:inputType="textPassword"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:inputType="textPassword"/>
 
         <!-- Aviso de privacidad -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
             <CheckBox
                 android:id="@+id/cbxAccept"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_margin="2dp" />
+                android:layout_margin="2dp"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -137,7 +136,6 @@
                     android:gravity="start"
                     android:text="Acepto el tratamiento de mis datos personales"
                     android:textSize="14sp" />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -147,9 +145,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:backgroundTint="@color/purple"
                         android:fontFamily="@font/karla"
                         android:gravity="start"
+                        android:backgroundTint="@color/purple"
                         android:text="de acuerdo al "
                         android:textSize="14sp" />
 
@@ -177,16 +175,16 @@
             android:backgroundTint="@color/purple"
             android:fontFamily="@font/karla_bold"
             android:text="Crear Cuenta"
-            android:textColor="@android:color/white"
-            android:textSize="16dp" />
+            android:textSize="16dp"
+            android:textColor="@android:color/white" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:fontFamily="@font/karla"
-            android:text="¿Ya tienes cuenta?"
             android:textAlignment="center"
+            android:text="¿Ya tienes cuenta?"
             android:textSize="16sp" />
 
         <TextView

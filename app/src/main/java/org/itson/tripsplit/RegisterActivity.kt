@@ -2,29 +2,17 @@ package org.itson.tripsplit
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
-import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp
 
 class RegisterActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        FirebaseApp.initializeApp(this)
-
         setContentView(R.layout.activity_register)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -32,14 +20,8 @@ class RegisterActivity : AppCompatActivity() {
             insets
         }
 
-        auth = Firebase.auth
-
         val txtPrivacity : TextView = findViewById(R.id.txtPrivacity)
         val txtLogin : TextView = findViewById(R.id.txtLogin)
-        val edtName : EditText = findViewById(R.id.edtName)
-        val edtEmail : EditText = findViewById(R.id.edtEmail)
-        val edtPass : EditText = findViewById(R.id.edtPass)
-        val edtConfirmPass : EditText = findViewById(R.id.edtConfirmPass)
         val btnRegister : Button = findViewById(R.id.btnRegister)
 
         txtPrivacity.paint.isUnderlineText = true
@@ -51,48 +33,9 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         btnRegister.setOnClickListener {
-            if (edtEmail.text.isEmpty()
-                || edtPass.text.isEmpty()
-                || edtConfirmPass.text.isEmpty()
-                || edtName.text.isEmpty()) {
-                Toast.makeText(
-                    baseContext,
-                    "Todos los campos deben estar llenos.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else if (!edtPass.text.toString().equals(edtConfirmPass.text.toString())) {
-                Toast.makeText(
-                    baseContext,
-                    "Las contraseñas no coinciden.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                signIn(edtEmail.text.toString(), edtPass.text.toString())
-            }
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
         }
 
-    }
-
-    fun signIn(email: String, password: String) {
-        Log.d("INFO", "email: ${email}, password: ${password}")
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    Log.d("INFO", "signInWithEmail:success")
-                    val user = auth.currentUser
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.putExtra("user", email)
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(intent)
-                } else {
-                    Log.w("ERROR", "signInWithEmail:failure", task.exception)
-                    Toast.makeText(
-                        baseContext,
-                        "El registro falló.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-            }
     }
 }

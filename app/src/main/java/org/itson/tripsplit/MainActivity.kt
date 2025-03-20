@@ -1,7 +1,6 @@
 package org.itson.tripsplit
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -36,15 +35,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 else -> false
             }
-        }
-
-        val user : String? = intent.extras!!.getString("user")
-        if (user!=null) {
-            Toast.makeText(
-                baseContext,
-                "Sesión iniciada: "+user,
-                Toast.LENGTH_SHORT
-            ).show()
         }
 
         // Cargar el fragmento por defecto (Grupos) al iniciar la app
