@@ -1,14 +1,18 @@
 package org.itson.tripsplit
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
+import android.view.MotionEvent
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
@@ -19,6 +23,7 @@ import com.google.firebase.FirebaseApp
 class RegisterActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -71,6 +76,66 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
+        var isPasswordVisible = false
+        edtPass.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableEnd = edtPass.compoundDrawables[2]
+                if (drawableEnd != null) {
+                    val bounds = drawableEnd.bounds
+                    val x = event.x.toInt()
+                    val drawableX = edtPass.width - edtPass.paddingEnd - bounds.width()
+                    if (x >= drawableX) {
+                        // Cambiar visibilidad
+                        isPasswordVisible = !isPasswordVisible
+                        if (isPasswordVisible) {
+                            edtPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_open, 0)
+                        } else {
+                            edtPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_closed, 0)
+                        }
+                        // Mantener cursor al final
+                        edtPass.setSelection(edtPass.text.length)
+                        // Recuperar formato original
+                        edtPass.textSize = 17f
+                        edtPass.typeface = ResourcesCompat.getFont(this, R.font.inter)
+                        return@setOnTouchListener true
+                    }
+                }
+            }
+            false
+        }
+
+        var isPassConfirmVisible = false
+        edtConfirmPass.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableEnd = edtConfirmPass.compoundDrawables[2]
+                if (drawableEnd != null) {
+                    val bounds = drawableEnd.bounds
+                    val x = event.x.toInt()
+                    val drawableX = edtConfirmPass.width - edtConfirmPass.paddingEnd - bounds.width()
+                    if (x >= drawableX) {
+                        // Cambiar visibilidad
+                        isPassConfirmVisible = !isPassConfirmVisible
+                        if (isPassConfirmVisible) {
+                            edtConfirmPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            edtConfirmPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_open, 0)
+                        } else {
+                            edtConfirmPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                            edtConfirmPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_closed, 0)
+                        }
+                        // Mantener cursor al final
+                        edtConfirmPass.setSelection(edtConfirmPass.text.length)
+                        // Recuperar formato original
+                        edtConfirmPass.textSize = 17f
+                        edtConfirmPass.typeface = ResourcesCompat.getFont(this, R.font.inter)
+                        return@setOnTouchListener true
+                    }
+                }
+            }
+            false
+        }
+
     }
 
     fun signIn(email: String, password: String) {
@@ -95,4 +160,5 @@ class RegisterActivity : AppCompatActivity() {
 
             }
     }
+
 }

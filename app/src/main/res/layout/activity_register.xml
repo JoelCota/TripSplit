@@ -11,22 +11,41 @@
     tools:context=".RegisterActivity">
 
     <!-- Encabezado con Gradiente -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_margin="10dp"
-        android:background="@drawable/gradient_title"
-        android:gravity="center">
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_margin="10dp"
+            android:foreground="@drawable/gradient_title"
+            android:gravity="top"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="50dp"
+                android:layout_gravity="center"
+                android:src="@drawable/logo" />
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="25dp"
             android:fontFamily="@font/inter"
             android:text="Crear Cuenta"
             android:textColor="@android:color/white"
-            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:textSize="30dp"
             android:textStyle="bold" />
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Contenido principal -->
     <LinearLayout
@@ -53,6 +72,8 @@
             android:layout_marginBottom="14dp"
             android:hint="Nombre completo"
             android:inputType="text"
+            android:paddingStart="16dp"
+            android:background="@drawable/edit_text"
             android:padding="10dp" />
 
 
@@ -73,6 +94,8 @@
             android:layout_marginBottom="14dp"
             android:hint="correo@direccion.com"
             android:inputType="text"
+            android:paddingStart="16dp"
+            android:background="@drawable/edit_text"
             android:padding="10dp" />
 
         <!-- Contraseña -->
@@ -92,6 +115,9 @@
             android:layout_marginBottom="14dp"
             android:hint="************"
             android:inputType="textPassword"
+            android:background="@drawable/edit_text"
+            android:paddingStart="16dp"
+            android:drawableEnd="@drawable/ic_eye_open"
             android:padding="10dp" />
 
         <TextView
@@ -110,6 +136,9 @@
             android:layout_marginBottom="14dp"
             android:hint="************"
             android:inputType="textPassword"
+            android:background="@drawable/edit_text"
+            android:paddingStart="16dp"
+            android:drawableEnd="@drawable/ic_eye_open"
             android:padding="10dp" />
 
         <!-- Aviso de privacidad -->
@@ -132,7 +161,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="4dp"
                     android:fontFamily="@font/karla"
                     android:gravity="start"
                     android:text="Acepto el tratamiento de mis datos personales"

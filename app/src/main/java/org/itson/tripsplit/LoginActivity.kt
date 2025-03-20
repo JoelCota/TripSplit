@@ -1,13 +1,18 @@
 package org.itson.tripsplit
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
+import android.util.Log
+import android.view.MotionEvent
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.Firebase
@@ -19,6 +24,7 @@ import com.google.firebase.auth.auth
 class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -57,6 +63,36 @@ class LoginActivity : AppCompatActivity() {
             }  else {
                 login(edtEmail.text.toString(), edtPass.text.toString())
             }
+        }
+
+        var isPasswordVisible = false
+        edtPass.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableEnd = edtPass.compoundDrawables[2]
+                if (drawableEnd != null) {
+                    val bounds = drawableEnd.bounds
+                    val x = event.x.toInt()
+                    val drawableX = edtPass.width - edtPass.paddingEnd - bounds.width()
+                    if (x >= drawableX) {
+                        // Cambiar visibilidad
+                        isPasswordVisible = !isPasswordVisible
+                        if (isPasswordVisible) {
+                            edtPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_open, 0)
+                        } else {
+                            edtPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_closed, 0)
+                        }
+                        // Mantener cursor al final
+                        edtPass.setSelection(edtPass.text.length)
+                        // Recuperar formato original
+                        edtPass.textSize = 18f
+                        edtPass.typeface = ResourcesCompat.getFont(this, R.font.inter)
+                        return@setOnTouchListener true
+                    }
+                }
+            }
+            false
         }
     }
 

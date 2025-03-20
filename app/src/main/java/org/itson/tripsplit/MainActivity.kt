@@ -1,6 +1,7 @@
 package org.itson.tripsplit
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.itson.tripsplit.fragments.CuentaFragment
 import org.itson.tripsplit.fragments.GruposFragment
 import org.itson.tripsplit.fragments.NuevoGastoFragment
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,8 +40,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val user : String? = intent.extras!!.getString("user")
-        if (user!=null) {
+        if (intent.extras!=null) {
+            val user : String? = intent.extras!!.getString("user")
             Toast.makeText(
                 baseContext,
                 "Sesión iniciada: "+user,
