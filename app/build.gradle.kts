@@ -52,10 +52,12 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation("com.google.android.material:material:1.11.0")
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation("com.google.firebase:firebase-database:21.0.0")
     implementation("com.google.firebase:firebase-auth")
 
 }

@@ -19,6 +19,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.database.FirebaseDatabase
+import org.itson.tripsplit.model.User
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -72,7 +74,10 @@ class RegisterActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                signIn(edtEmail.text.toString(), edtPass.text.toString())
+                signIn(
+                    edtEmail.text.toString(),
+                    edtName.text.toString(),
+                    edtPass.text.toString())
             }
         }
 
@@ -138,13 +143,35 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 
-    fun signIn(email: String, password: String) {
+    fun signIn(email: String, name: String, password: String) {
         Log.d("INFO", "email: ${email}, password: ${password}")
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    val intent = Intent(this, LoginActivity::class.java)
-                    startActivity(intent)
+                    val uid : String = auth.currentUser?.uid!!
+                    val user = User(
+                        uid,
+                        email,
+                        name
+                    )
+                    val userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
+
+                    userRef.setValue(user).addOnSuccessListener {
+                        Toast.makeText(
+                            baseContext,
+                            "Usuario registrado.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        val intent = Intent(this, LoginActivity::class.java)
+                        startActivity(intent)
+                    } .addOnFailureListener { e ->
+                        Log.w("ERROR", "El registro falló.", task.exception)
+                        Toast.makeText(
+                            baseContext,
+                            "El registro falló.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 } else {
                     Log.w("ERROR", "signInWithEmail:failure", task.exception)
                     Toast.makeText(

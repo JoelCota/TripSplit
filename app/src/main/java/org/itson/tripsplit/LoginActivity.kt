@@ -98,7 +98,6 @@ class LoginActivity : AppCompatActivity() {
 
     fun goToMain(user: FirebaseUser) {
         val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("user", user.email)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
