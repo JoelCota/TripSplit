@@ -7,7 +7,7 @@
     android:background="@color/lightGray"
     android:orientation="vertical"
     android:paddingTop="25dp"
-    tools:context=".fragments.NuevoGastoFragment">
+    tools:context=".ui.fragments.NuevoGastoFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

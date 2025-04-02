@@ -1,4 +1,4 @@
-package org.itson.tripsplit.fragments
+package org.itson.tripsplit.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,7 +16,7 @@ import org.itson.tripsplit.R
 class EditarGrupoFragment : Fragment() {
 
     private lateinit var txtTripTitle: TextView
-    private lateinit var btnEditTitle: TextView
+    private lateinit var btnEditTitle: ImageButton
     private lateinit var memberJuan: TextView
     private lateinit var btnDeleteJuan: ImageButton
     private lateinit var memberDiego: TextView

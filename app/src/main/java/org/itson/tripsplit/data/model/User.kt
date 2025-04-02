@@ -1,4 +1,4 @@
-package org.itson.tripsplit.model
+package org.itson.tripsplit.data.model
 
 data class User(
     var uid : String? = null,

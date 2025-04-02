@@ -1,4 +1,4 @@
-package org.itson.tripsplit
+package org.itson.tripsplit.ui.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -20,7 +20,8 @@ import com.google.firebase.auth.auth
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.FirebaseDatabase
-import org.itson.tripsplit.model.User
+import org.itson.tripsplit.R
+import org.itson.tripsplit.data.model.User
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -94,10 +95,12 @@ class RegisterActivity : AppCompatActivity() {
                         isPasswordVisible = !isPasswordVisible
                         if (isPasswordVisible) {
                             edtPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_open, 0)
+                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                                R.drawable.ic_eye_open, 0)
                         } else {
                             edtPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_closed, 0)
+                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                                R.drawable.ic_eye_closed, 0)
                         }
                         // Mantener cursor al final
                         edtPass.setSelection(edtPass.text.length)
@@ -124,10 +127,12 @@ class RegisterActivity : AppCompatActivity() {
                         isPassConfirmVisible = !isPassConfirmVisible
                         if (isPassConfirmVisible) {
                             edtConfirmPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                            edtConfirmPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_open, 0)
+                            edtConfirmPass.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                                R.drawable.ic_eye_open, 0)
                         } else {
                             edtConfirmPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                            edtConfirmPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_closed, 0)
+                            edtConfirmPass.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                                R.drawable.ic_eye_closed, 0)
                         }
                         // Mantener cursor al final
                         edtConfirmPass.setSelection(edtConfirmPass.text.length)

@@ -1,4 +1,4 @@
-package org.itson.tripsplit.fragments
+package org.itson.tripsplit.ui.fragments
 
 import android.os.Build
 import android.os.Bundle
@@ -112,13 +112,15 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
 
         // Click en "Seleccionar Moneda"
         btnSetCurrency.setOnClickListener {
-            val dialog = ListaSeleccionDialogFragment.newInstance(monedas, "Seleccionar Moneda", this)
+            val dialog =
+                ListaSeleccionDialogFragment.newInstance(monedas, "Seleccionar Moneda", this)
             dialog.show(parentFragmentManager, "currencyDialog")
         }
 
         // Click en "Seleccionar Categoría"
         btnCategories.setOnClickListener {
-            val dialog = ListaSeleccionDialogFragment.newInstance(categorias, "Seleccionar Categoría", this)
+            val dialog =
+                ListaSeleccionDialogFragment.newInstance(categorias, "Seleccionar Categoría", this)
             dialog.show(parentFragmentManager, "categoryDialog")
         }
 

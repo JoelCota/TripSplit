@@ -1,10 +1,9 @@
-package org.itson.tripsplit
+package org.itson.tripsplit.ui.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.MotionEvent
 import android.widget.Button
 import android.widget.EditText
@@ -20,6 +19,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
+import org.itson.tripsplit.R
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -78,10 +78,12 @@ class LoginActivity : AppCompatActivity() {
                         isPasswordVisible = !isPasswordVisible
                         if (isPasswordVisible) {
                             edtPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_open, 0)
+                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                                R.drawable.ic_eye_open, 0)
                         } else {
                             edtPass.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye_closed, 0)
+                            edtPass.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                                R.drawable.ic_eye_closed, 0)
                         }
                         // Mantener cursor al final
                         edtPass.setSelection(edtPass.text.length)

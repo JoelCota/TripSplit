@@ -1,4 +1,4 @@
-package org.itson.tripsplit.fragments
+package org.itson.tripsplit.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater

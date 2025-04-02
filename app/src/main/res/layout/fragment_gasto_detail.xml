@@ -7,7 +7,6 @@
     android:orientation="vertical"
     android:paddingTop="25dp">
 
-    <!-- Contenedor superior -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/activity_tittle_box_vertical"
@@ -18,23 +17,20 @@
         android:paddingStart="20dp"
         android:paddingEnd="16dp">
 
-        <!-- Botón de retroceso -->
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="Volver"
-            android:src="@android:drawable/ic_menu_revert" /> <!-- Icono de retroceso -->
+            android:src="@drawable/ic_back" />
 
-        <!-- Contenedor horizontal para el título y el botón -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Título alineado a la izquierda -->
             <TextView
                 android:id="@+id/txtTripTitle"
                 android:layout_width="wrap_content"
@@ -42,7 +38,8 @@
                 android:layout_weight="1"
                 android:text="Detalle del Gasto"
                 android:textColor="@android:color/white"
-                android:textSize="24sp"
+                android:textSize="@dimen/title_font_size"
+                android:gravity="center"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -97,7 +94,7 @@
             android:layout_height="40dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="Eliminar Grupo"
-            android:src="@android:drawable/ic_menu_delete" />
+            android:src="@drawable/ic_delete" />
 
         <ImageButton
             android:id="@+id/btnEditTitle"
@@ -105,7 +102,8 @@
             android:layout_height="40dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="Editar título"
-            android:src="@android:drawable/ic_menu_edit" />
+            android:src="@drawable/ic_edit"
+            app:tint="@color/black" />
 
     </LinearLayout>
 

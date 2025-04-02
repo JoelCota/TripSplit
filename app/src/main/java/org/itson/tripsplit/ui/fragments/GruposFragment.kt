@@ -1,4 +1,4 @@
-package org.itson.tripsplit.fragments
+package org.itson.tripsplit.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import org.itson.tripsplit.Group
+import org.itson.tripsplit.data.model.Group
 import org.itson.tripsplit.R
 
 class GruposFragment : Fragment() {

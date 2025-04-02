@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/lightGray"
-    tools:context=".LoginActivity"
+    tools:context=".ui.activities.LoginActivity"
     android:id="@+id/main">
 
     <!-- Encabezado con Gradiente -->

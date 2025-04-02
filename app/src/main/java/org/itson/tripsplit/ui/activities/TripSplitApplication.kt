@@ -1,4 +1,4 @@
-package org.itson.tripsplit
+package org.itson.tripsplit.ui.activities
 
 import android.app.Application
 import com.google.firebase.FirebaseApp

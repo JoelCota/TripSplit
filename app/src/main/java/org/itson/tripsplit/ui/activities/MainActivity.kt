@@ -1,4 +1,4 @@
-package org.itson.tripsplit
+package org.itson.tripsplit.ui.activities
 
 import android.os.Bundle
 import android.util.Log
@@ -12,10 +12,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import org.itson.tripsplit.fragments.CuentaFragment
-import org.itson.tripsplit.fragments.GruposFragment
-import org.itson.tripsplit.fragments.NuevoGastoFragment
-import org.itson.tripsplit.model.User
+import org.itson.tripsplit.R
+import org.itson.tripsplit.ui.fragments.CuentaFragment
+import org.itson.tripsplit.ui.fragments.GruposFragment
+import org.itson.tripsplit.ui.fragments.NuevoGastoFragment
+import org.itson.tripsplit.data.model.User
 
 class MainActivity : AppCompatActivity() {
     private var currentUser : User? = null

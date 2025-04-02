@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:background="@color/lightGray"
     android:paddingTop="25dp"
-    tools:context=".MainActivity">
+    tools:context=".ui.activities.MainActivity">
 
     <!-- Encabezado con Gradiente -->
     <LinearLayout
@@ -23,7 +23,7 @@
             android:fontFamily="@font/inter"
             android:text="!Comienza tu Grupo!"
             android:textColor="@android:color/white"
-            android:textSize="32sp"
+            android:textSize="@dimen/title_font_size"
             android:textStyle="bold"
             />
     </LinearLayout>
