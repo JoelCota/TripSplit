@@ -1,0 +1,31 @@
+* [33m5f066ae[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelopment[m[33m)[m agregado drawable y modificados los layout
+* [33m88dd54d[m Add Reportes
+* [33m5932316[m[33m ([m[1;31morigin/development[m[33m)[m Modificacion de botones en grupos y gasto
+* [33m5b8c22d[m Acomodo de paquetes y reconfiguracion de fragmentso
+* [33m5abaddb[m Add conección a Realtime Database
+* [33m359396a[m add pantallas gastos
+* [33m7dc66df[m Revert "Merge branch 'development' of https://github.com/JoelCota/TripSplit into development"
+*   [33m7c0e42a[m Merge branch 'development' of https://github.com/JoelCota/TripSplit into development
+[32m|[m[33m\[m  
+[32m|[m * [33m2d1d052[m "Add Reportes"
+* [33m|[m [33mb31d35e[m Actualizadas pantallas de login y register
+[33m|[m[33m/[m  
+*   [33m98412c8[m Merge remote-tracking branch 'origin/development' into development
+[34m|[m[35m\[m  
+[34m|[m *   [33m214cf1f[m Merge pull request #2 from RobertoContEz/development
+[34m|[m [36m|[m[1;31m\[m  
+* [36m|[m [1;31m\[m   [33m323679b[m Add Reportes
+[36m|[m[1;31m\[m [36m\[m [1;31m\[m  
+[36m|[m [1;31m|[m[36m/[m [1;31m/[m  
+[36m|[m[36m/[m[1;31m|[m [1;31m/[m   
+[36m|[m [1;31m|[m[1;31m/[m    
+[36m|[m * [33m550c985[m Register y Login
+* [1;33m|[m [33m2631c6b[m Add and Update
+* [1;33m|[m [33m173b75a[m Add pantallas principales
+* [1;33m|[m [33mae50f4a[m Add pantallas principales
+* [1;33m|[m [33ma642880[m Merge pull request #1 from RobertoContEz/development
+[1;34m|[m[1;33m\[m[1;33m|[m 
+[1;34m|[m * [33m45dc4b9[m Pantallas de Login y Register
+[1;34m|[m[1;34m/[m  
+* [33m7212095[m Actualizacion de pantallas
+* [33m2ec0695[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Initial commit

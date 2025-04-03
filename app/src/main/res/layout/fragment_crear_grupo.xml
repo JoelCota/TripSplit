@@ -21,11 +21,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter"
-            android:text="!Comienza tu Grupo!"
+            android:text="¡Comienza tu Grupo!"
             android:textColor="@android:color/white"
             android:textSize="@dimen/title_font_size"
-            android:textStyle="bold"
-            />
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Contenido principal -->
