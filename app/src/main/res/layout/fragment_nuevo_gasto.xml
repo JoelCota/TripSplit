@@ -12,7 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/activity_tittle_box_vertical"
-        android:layout_margin="14dp"
+        android:layout_margin="10dp"
         android:background="@drawable/gradient_title"
         android:gravity="center_vertical"
         android:orientation="vertical"
@@ -27,14 +27,16 @@
             android:contentDescription="Cancelar"
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
-        <Spinner
-            android:id="@+id/spinnerTitle"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/txtNuevoGastoTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/inter"
-            android:textColor="@android:color/black"
-            android:textSize="32sp"
+            android:layout_gravity="center"
+            android:text="Nuevo Gasto"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/title_font_size"
             android:textStyle="bold" />
+
     </LinearLayout>
 
     <LinearLayout

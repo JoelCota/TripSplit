@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:paddingTop="25dp">
 
-
+    <!-- Sección del título -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/activity_tittle_box_vertical"
@@ -32,7 +32,6 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Título alineado a la izquierda -->
             <TextView
                 android:id="@+id/txtTripTitle"
                 android:layout_width="wrap_content"
@@ -54,157 +53,86 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Contenedor con peso para empujar el botón hacia abajo -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/rounded_bg"
-        android:orientation="vertical"
-        android:padding="25dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <!-- Han gastado -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Han gastado: $110.00"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <!-- Te deben en total -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Te deben $50.00 en total"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="16sp"
-            android:layout_marginTop="8dp"/>
-
-        <!-- Detalles de las deudas -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Juan te debe $25.00"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Diego te debe $25.00"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Debes $10.00 a Juan"
-            android:textColor="@android:color/holo_red_dark"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"/>
-    </LinearLayout>
-
-    <!-- Reporte de gastos -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/rounded_bg"
-        android:orientation="vertical"
-        android:padding="25dp">
-
-        <!-- Título del reporte -->
+        <!-- Sección de gastos -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="start|center_vertical"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_margin="10dp"
+            android:background="@drawable/rounded_bg"
+            android:orientation="vertical"
+            android:padding="25dp">
 
             <TextView
+                android:id="@+id/totalGastado"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Febrero 2025"
+                android:text="Han gastado: $110.00"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
-                android:layout_weight="1"
-                android:textStyle="bold"
-                android:layout_marginEnd="16dp"/>
+                android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reporte Gastos"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+            <ListView
+                android:id="@+id/listaDeudas"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"/>
         </LinearLayout>
 
-        <!-- Gasto: Nieve -->
-        <LinearLayout
-            android:id="@+id/gastoNieve"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start|center_vertical"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Feb 26"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Gasto nieve"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Pagaste $75.00"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"/>
-        </LinearLayout>
-
-        <!-- Gasto: Papas -->
+        <!-- Reporte de gastos -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="start|center_vertical"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_margin="10dp"
+            android:background="@drawable/rounded_bg"
+            android:orientation="vertical"
+            android:padding="25dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Feb 26"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:layout_marginEnd="8dp" />
+                android:gravity="start|center_vertical"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Papas"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:layout_weight="1"/>
+                <TextView
+                    android:id="@+id/textMesGasto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    android:text="Febrero 2025"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="16dp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Juan pagó $35.00"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reporte Gastos"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/listGastos"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"/>
         </LinearLayout>
-
     </LinearLayout>
+
+    <!-- Botón flotante en la esquina inferior derecha -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_gasto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="@color/white"/>
 </LinearLayout>
