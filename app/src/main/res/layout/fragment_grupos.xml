@@ -1,11 +1,10 @@
-<!-- activity_main.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingTop="25dp"
-    android:background="@color/lightGray"
-    >
+    android:background="@color/lightGray">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,21 +23,27 @@
             android:textStyle="bold"/>
     </LinearLayout>
 
-    <!-- ScrollView para los grupos -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:padding="20dp">
 
-        <!-- LinearLayout vertical para contener los items -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:id="@+id/linearLayoutGroups">
+            android:id="@+id/linearLayoutGroups"/>
 
-            <!-- Los grupos se agregarán dinámicamente aquí -->
-        </LinearLayout>
     </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_input_add"
+        android:background="@drawable/rounded_bg"
+        app:backgroundTint="@color/white"/>
 </LinearLayout>

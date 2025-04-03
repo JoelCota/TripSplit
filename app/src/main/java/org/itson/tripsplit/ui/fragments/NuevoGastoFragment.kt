@@ -38,55 +38,6 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
     ): View {
         val rootView = inflater.inflate(R.layout.fragment_nuevo_gasto, container, false)
 
-        // Inicializar el Spinner
-        spinner = rootView.findViewById(R.id.spinnerTitle)
-
-        // Crear un ArrayAdapter para llenar el Spinner con los viajes
-        val adapter = object : ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, viajes) {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getDropDownView(position, convertView, parent)
-                val textView = view.findViewById<TextView>(android.R.id.text1)
-
-                // Modificar el estilo del texto del Dropdown (menú desplegable)
-                textView.setTextSize(32f)  // Tamaño del texto
-                textView.setTextColor(resources.getColor(android.R.color.black)) // Color del texto
-                textView.typeface = resources.getFont(R.font.inter)  // Establecer la fuente personalizada
-                textView.setTypeface(textView.typeface, android.graphics.Typeface.BOLD) // Estilo en negritas
-                return view
-            }
-
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getView(position, convertView, parent)
-                val textView = view.findViewById<TextView>(android.R.id.text1)
-
-                // Modificar el estilo del texto en la vista seleccionada
-                textView.setTextSize(32f)  // Tamaño del texto
-                textView.setTextColor(resources.getColor(android.R.color.white)) // Color del texto
-                textView.typeface = resources.getFont(R.font.inter) // Establecer la fuente personalizada
-                textView.setTypeface(textView.typeface, android.graphics.Typeface.BOLD) // Estilo en negritas
-
-                return view
-            }
-        }
-
-        // Configurar el Spinner con el adaptador
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
-
-        // Configurar el listener para detectar selección en el Spinner
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parentView: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedTitle = parentView.getItemAtPosition(position).toString()
-                // Hacer algo con el título seleccionado, por ejemplo, mostrar un mensaje
-                Toast.makeText(requireContext(), "Seleccionaste: $selectedTitle", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onNothingSelected(parentView: AdapterView<*>) {
-                // Acción cuando no se selecciona ningún ítem
-            }
-        }
 
         // Inicializar los TextView
         txtPagadoPor = rootView.findViewById(R.id.txtPagadoPor)

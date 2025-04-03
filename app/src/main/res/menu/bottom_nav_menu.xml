@@ -5,10 +5,6 @@
         android:icon="@drawable/ic_group"
         android:title="Grupos" />
     <item
-        android:id="@+id/nav_nuevo_gasto"
-        android:icon="@drawable/ic_add"
-        android:title="Nuevo Gasto" />
-    <item
         android:id="@+id/nav_cuenta"
         android:icon="@drawable/ic_account"
         android:title="Cuenta" />

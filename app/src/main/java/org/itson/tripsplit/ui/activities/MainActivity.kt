@@ -17,6 +17,7 @@ import org.itson.tripsplit.ui.fragments.CuentaFragment
 import org.itson.tripsplit.ui.fragments.GruposFragment
 import org.itson.tripsplit.ui.fragments.NuevoGastoFragment
 import org.itson.tripsplit.data.model.User
+import org.itson.tripsplit.ui.fragments.SinGruposFragment
 
 class MainActivity : AppCompatActivity() {
     private var currentUser : User? = null
@@ -40,10 +41,6 @@ class MainActivity : AppCompatActivity() {
                     replaceFragment(GruposFragment())
                     true
                 }
-                R.id.nav_nuevo_gasto -> {
-                    replaceFragment(NuevoGastoFragment())
-                    true
-                }
                 R.id.nav_cuenta -> {
                     replaceFragment(CuentaFragment())
                     true
@@ -54,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         // Cargar el fragmento por defecto (Grupos) al iniciar la app
         if (savedInstanceState == null) {
-            replaceFragment(GruposFragment())
+            replaceFragment(SinGruposFragment())
         }
     }
 
