@@ -19,10 +19,14 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import org.itson.tripsplit.R
+import org.itson.tripsplit.ui.fragments.CrearGrupoFragment
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
+    private lateinit var database: DatabaseReference
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +35,7 @@ class LoginActivity : AppCompatActivity() {
 
         FirebaseApp.initializeApp(this)
         auth = Firebase.auth
+        database = FirebaseDatabase.getInstance().reference
 
         setContentView(R.layout.activity_login)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -99,8 +104,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun goToMain(user: FirebaseUser) {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val intent = Intent(this, CrearGrupoFragment::class.java)
         startActivity(intent)
     }
 
@@ -108,8 +112,10 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    goToMain(user!!)
+                    val userId = auth.currentUser?.uid
+                    if (userId != null) {
+                        verificarGrupos(userId)
+                    }
                 } else {
                     Toast.makeText(
                         baseContext,
@@ -118,6 +124,22 @@ class LoginActivity : AppCompatActivity() {
                     ).show()
                 }
             }
+    }
+
+    private fun verificarGrupos(userId: String) {
+        val userGroupsRef = database.child("Grupos").orderByChild("creadorId").equalTo(userId)
+
+        userGroupsRef.get().addOnSuccessListener { snapshot ->
+            if (!snapshot.exists()) {
+                // Si el usuario no tiene grupos, enviar señal para ir a CrearGrupoFragment
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("ir_a_crear_grupo", true)
+                startActivity(intent)
+                finish()
+            }
+        }.addOnFailureListener {
+            Toast.makeText(this, "Error al verificar grupos", Toast.LENGTH_SHORT).show()
+        }
     }
 
 }

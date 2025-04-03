@@ -4,4 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_home">
+    <action
+        android:id="@+id/action_crearGrupoFragment_to_gruposFragment"
+        app:destination="@id/fragmentoGrupos"/>
+    <action
+        android:id="@+id/action_loginFragment_to_crearGrupoFragment"
+        app:destination="@id/crearGrupoFragment"/>
 </navigation>

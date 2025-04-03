@@ -6,6 +6,10 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -20,11 +24,19 @@ import org.itson.tripsplit.data.model.User
 
 class MainActivity : AppCompatActivity() {
     private var currentUser : User? = null
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment
+        navController = navHostFragment.navController
+
+        if(intent.getBooleanExtra("ir_a_crear_grupo", false)){
+            navController.navigate(R.id.crearGrupoFragment)
+        }
 
         // Cargar datos del usuario
         loadUserData()
