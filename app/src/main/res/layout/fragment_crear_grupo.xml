@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:background="@color/lightGray"
     android:paddingTop="25dp"
+    android:id="@+id/crearGrupoFragment"
     tools:context=".ui.activities.MainActivity">
 
     <!-- Encabezado con Gradiente -->

@@ -4,18 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_home">
-
-    <fragment
-        android:id="@+id/cuentaFragment"
-        android:name="org.itson.tripsplit.CuentaFragment"
-        android:label="Cuenta">
-        <action
-            android:id="@+id/action_cuentaFragment_to_detalleViajeFragment"
-            app:destination="@id/detalleViajeFragment"/>
-    </fragment>
-
-    <fragment
-        android:id="@+id/detalleViajeFragment"
-        android:name="org.itson.tripsplit.DetalleViajeFragment"
-        android:label="Detalle Viaje"/>
+    <action
+        android:id="@+id/action_crearGrupoFragment_to_gruposFragment"
+        app:destination="@id/fragmentoGrupos"/>
+    <action
+        android:id="@+id/action_loginFragment_to_crearGrupoFragment"
+        app:destination="@id/crearGrupoFragment"/>
 </navigation>
