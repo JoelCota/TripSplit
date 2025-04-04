@@ -42,7 +42,6 @@ class RegisterActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
-        val txtPrivacity : TextView = findViewById(R.id.txtPrivacity)
         val txtLogin : TextView = findViewById(R.id.txtLogin)
         val edtName : EditText = findViewById(R.id.edtName)
         val edtEmail : EditText = findViewById(R.id.edtEmail)
@@ -50,7 +49,6 @@ class RegisterActivity : AppCompatActivity() {
         val edtConfirmPass : EditText = findViewById(R.id.edtConfirmPass)
         val btnRegister : Button = findViewById(R.id.btnRegister)
 
-        txtPrivacity.paint.isUnderlineText = true
         txtLogin.paint.isUnderlineText = true
 
         txtLogin.setOnClickListener {
@@ -76,7 +74,7 @@ class RegisterActivity : AppCompatActivity() {
                 ).show()
             } else {
                 signIn(
-                    edtEmail.text.toString(),
+                    edtEmail.text.toString().trim(),
                     edtName.text.toString(),
                     edtPass.text.toString())
             }
@@ -169,6 +167,7 @@ class RegisterActivity : AppCompatActivity() {
                         ).show()
                         val intent = Intent(this, LoginActivity::class.java)
                         startActivity(intent)
+                        finish()
                     } .addOnFailureListener { e ->
                         Log.w("ERROR", "El registro falló.", task.exception)
                         Toast.makeText(

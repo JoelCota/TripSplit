@@ -30,7 +30,6 @@ class SinGruposFragment : Fragment() {
             replaceFragment(UnirseGrupoFragment())
             Toast.makeText(context, "Únete a un grupo", Toast.LENGTH_SHORT).show()
         }
-
         return rootView
     }
 

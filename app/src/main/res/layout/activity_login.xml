@@ -91,7 +91,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:hint="************"
+            android:hint="***********"
             android:fontFamily="@font/inter"
             android:textSize="18sp"
             android:padding="10dp"
@@ -127,14 +127,14 @@
 
             <TextView
                 android:id="@+id/txtForgotPass"
-                android:layout_width="165dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:focusable="true"
                 android:text="Olvidé mi contraseña"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </GridLayout>
 
         <Button

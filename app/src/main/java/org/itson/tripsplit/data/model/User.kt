@@ -1,11 +1,11 @@
 package org.itson.tripsplit.data.model
 
 data class User(
-    var uid : String? = null,
-    var email : String? = null,
-    var name : String? = null
+    val uid: String = "",
+    val email: String?,
+    val name: String?,
+    val groups: Map<String, Boolean> = mapOf(),
+    val expenses: Map<String, Expense> = mapOf()
 ) {
-    override fun toString(): String {
-        return uid+"\t"+email+"\t"+name
-    }
+    constructor() : this("", "", "", emptyMap(),emptyMap())
 }

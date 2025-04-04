@@ -8,6 +8,12 @@
         android:id="@+id/action_crearGrupoFragment_to_gruposFragment"
         app:destination="@id/fragmentoGrupos"/>
     <action
+        android:id="@+id/action_gruposFragment_to_gruposDetailFragment"
+        app:destination="@id/fragmentGruposDetail"/>
+    <action
+        android:id="@+id/action_unirseGrupoFragment_to_gruposFragment"
+        app:destination="@id/fragmentoGrupos"/>
+    <action
         android:id="@+id/action_loginFragment_to_crearGrupoFragment"
         app:destination="@id/crearGrupoFragment"/>
 </navigation>

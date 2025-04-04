@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/lightGray"
     android:orientation="vertical"
+    android:id="@+id/fragmentGruposDetail"
     android:paddingTop="25dp">
 
     <!-- Sección del título -->

@@ -66,7 +66,7 @@ class LoginActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }  else {
-                login(edtEmail.text.toString(), edtPass.text.toString())
+                login(edtEmail.text.toString().trim(), edtPass.text.toString())
             }
         }
 
@@ -104,7 +104,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun goToMain(user: FirebaseUser) {
-        val intent = Intent(this, CrearGrupoFragment::class.java)
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("user", user.uid)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
 
@@ -112,10 +114,8 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    val userId = auth.currentUser?.uid
-                    if (userId != null) {
-                        verificarGrupos(userId)
-                    }
+                    val user = auth.currentUser
+                    goToMain(user!!)
                 } else {
                     Toast.makeText(
                         baseContext,
@@ -126,20 +126,20 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    private fun verificarGrupos(userId: String) {
-        val userGroupsRef = database.child("Grupos").orderByChild("creadorId").equalTo(userId)
-
-        userGroupsRef.get().addOnSuccessListener { snapshot ->
-            if (!snapshot.exists()) {
-                // Si el usuario no tiene grupos, enviar señal para ir a CrearGrupoFragment
-                val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("ir_a_crear_grupo", true)
-                startActivity(intent)
-                finish()
-            }
-        }.addOnFailureListener {
-            Toast.makeText(this, "Error al verificar grupos", Toast.LENGTH_SHORT).show()
-        }
-    }
+//    private fun verificarGrupos(userId: String) {
+//        val userGroupsRef = database.child("Grupos").orderByChild("creadorId").equalTo(userId)
+//
+//        userGroupsRef.get().addOnSuccessListener { snapshot ->
+//            if (!snapshot.exists()) {
+//                // Si el usuario no tiene grupos, enviar señal para ir a CrearGrupoFragment
+//                val intent = Intent(this, MainActivity::class.java)
+//                intent.putExtra("ir_a_crear_grupo", true)
+//                startActivity(intent)
+//                finish()
+//            }
+//        }.addOnFailureListener {
+//            Toast.makeText(this, "Error al verificar grupos", Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
 }
