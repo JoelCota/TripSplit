@@ -82,133 +82,18 @@
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_account"
-                android:layout_marginEnd="10dp"
-                app:tint="@color/black" />
-
-            <TextView
-                android:id="@+id/memberJuan"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Juan Daniel Castro"
-                android:textSize="16sp"
-                android:textColor="@android:color/black" />
-
-            <ImageButton
-                android:id="@+id/btnDeleteJuan"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:visibility="invisible"
-
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Eliminar miembro"
-                android:src="@android:drawable/ic_menu_delete" />
-        </LinearLayout>
-
-            <!-- Miembro Diego -->
             <LinearLayout
+                android:id="@+id/contenedorUsuarios"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="10dp"
-                    android:src="@drawable/ic_account"
-                    app:tint="@color/black" />
-
-                <TextView
-                    android:id="@+id/memberDiego"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Diego Hernandez"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/black" />
-
-                <!-- Botón para eliminar usuario -->
-                <ImageButton
-                    android:id="@+id/btnDeleteDiego"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:visibility="invisible"
-                    android:src="@android:drawable/ic_menu_delete"
-                    android:background="?android:attr/selectableItemBackgroundBorderless" />
+                android:orientation="vertical"
+                android:paddingBottom="16dp" />
+        </ScrollView>
             </LinearLayout>
-
-            <!-- Miembro Joel -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_account"
-                    android:layout_marginEnd="10dp"
-                    app:tint="@color/black" />
-
-                <TextView
-                    android:id="@+id/memberJoel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Joel Lopez Cota"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/black" />
-
-                <!-- Botón para eliminar usuario -->
-                <ImageButton
-                    android:id="@+id/btnDeleteJoel"
-                    android:layout_width="40dp"
-                    android:visibility="invisible"
-                    android:layout_height="40dp"
-                    android:src="@android:drawable/ic_menu_delete"
-                    android:background="?android:attr/selectableItemBackgroundBorderless" />
-            </LinearLayout>
-
-
-        <!-- Eliminar grupo -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true">
-
-            <ImageButton
-                android:id="@+id/btnDeleteGroup"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Eliminar Grupo"
-                android:src="@android:drawable/ic_menu_delete" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Eliminar Grupo"
-                android:layout_gravity="center"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
-        </LinearLayout>
-
     </LinearLayout>
-
-</LinearLayout>

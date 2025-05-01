@@ -11,58 +11,51 @@ import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
 import android.content.ClipboardManager
 import android.content.Context
+import android.util.Log
+import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import org.itson.tripsplit.R
+import org.itson.tripsplit.data.model.Usuario
+import org.itson.tripsplit.data.repository.*
 
 class EditarGrupoFragment : Fragment() {
 
     private lateinit var txtTripTitle: TextView
     private lateinit var btnEditTitle: ImageButton
-    private lateinit var memberJuan: TextView
-    private lateinit var btnDeleteJuan: ImageButton
-    private lateinit var memberDiego: TextView
-    private lateinit var btnDeleteDiego: ImageButton
-    private lateinit var memberJoel: TextView
-    private lateinit var btnDeleteJoel: ImageButton
     private lateinit var txtCopyLink: TextView
     private lateinit var btnBack: ImageButton
+    private val listaUsers: MutableList<Usuario> = mutableListOf()
+    private lateinit var contenedorUsuarios: LinearLayout
+    private lateinit var idCreadorDelGrupo: String
+
+    private lateinit var groupId: String
+    private val grupoRepository = GrupoRepository()
+    private val userRepository = UserRepository()
+    private val databaseRef = FirebaseDatabase.getInstance().getReference("grupos")
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_editar_grupo, container, false)
+
         btnBack = view.findViewById(R.id.btnBack)
-        val grupoId = arguments?.getString("grupoId") ?: ""
         // Inicializar vistas
         txtTripTitle = view.findViewById(R.id.txtTripTitle)
         btnEditTitle = view.findViewById(R.id.btnEditGroup)
-        memberJuan = view.findViewById(R.id.memberJuan)
-        btnDeleteJuan = view.findViewById(R.id.btnDeleteJuan)
-        memberDiego = view.findViewById(R.id.memberDiego)
-        btnDeleteDiego = view.findViewById(R.id.btnDeleteDiego)
-        memberJoel = view.findViewById(R.id.memberJoel)
-        btnDeleteJoel = view.findViewById(R.id.btnDeleteJoel)
         txtCopyLink = view.findViewById(R.id.txtCopyLink)
+
 
         // Lógica para editar el título
         txtTripTitle.setOnClickListener() {
             showEditTitleDialog()
-        }
-        btnEditTitle.setOnClickListener {
-            // Cambiar visibilidad de los botones de eliminación
-            btnDeleteJuan.visibility = View.VISIBLE
-            btnDeleteDiego.visibility = View.VISIBLE
-            btnDeleteJoel.visibility = View.VISIBLE
-        }
-
-        // Lógica para eliminar miembros
-        btnDeleteJuan.setOnClickListener {
-            showDeleteConfirmationDialog(memberJuan)
-        }
-        btnDeleteDiego.setOnClickListener {
-            showDeleteConfirmationDialog(memberDiego)
-        }
-        btnDeleteJoel.setOnClickListener {
-            showDeleteConfirmationDialog(memberJoel)
         }
         // Hacer que btnBack regrese al fragmento anterior
         btnBack.setOnClickListener {
@@ -70,11 +63,88 @@ class EditarGrupoFragment : Fragment() {
         }
         // Lógica para copiar el enlace
         txtCopyLink.setOnClickListener {
-            copyLinkToClipboard(grupoId)
+            copyLinkToClipboard("http://example.com") // Cambia con el enlace real
         }
-
         return view
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Obtener el ID del grupo desde los argumentos
+        groupId = arguments?.getString("grupoId") ?: ""
+
+        if (groupId.isEmpty()) {
+            Toast.makeText(requireContext(), "ID del grupo inválido", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        contenedorUsuarios = view.findViewById(R.id.contenedorUsuarios)
+
+        // Cargar los miembros del grupo
+        cargarMiembrosGrupo()
+    }
+
+    private fun cargarMiembrosGrupo() {
+        val grupoId = arguments?.getString("grupoId") ?: return
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        val grupoRepository = GrupoRepository()
+        grupoRepository.esUsuarioCreador(grupoId, currentUserId) { esCreador ->
+            
+            grupoRepository.obtenerUsuariosDeGrupo(grupoId) { listaUsuarios ->
+
+                val layoutContenedor = view?.findViewById<LinearLayout>(R.id.contenedorUsuarios)
+                layoutContenedor?.removeAllViews()
+
+                for (usuario in listaUsuarios) {
+                    val vistaMiembro = layoutInflater.inflate(R.layout.user, layoutContenedor, false)
+
+                    val txtNombre = vistaMiembro.findViewById<TextView>(R.id.member)
+                    val btnEliminar = vistaMiembro.findViewById<ImageButton>(R.id.btnDeleteUser)
+
+                    txtNombre.text = usuario.nombre
+
+                    // Mostrar el botón solo si es el creador
+                    btnEliminar.visibility = if (esCreador) View.VISIBLE else View.GONE
+
+                    btnEliminar.setOnClickListener {
+                        mostrarDialogoConfirmacion(usuario.id, grupoId, vistaMiembro)
+                    }
+
+                    layoutContenedor?.addView(vistaMiembro)
+                }
+            }
+        }
+    }
+
+    private fun mostrarDialogoConfirmacion(userId: String, grupoId: String, vista: View) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Eliminar miembro")
+            .setMessage("¿Estás seguro de eliminar a este miembro del grupo?")
+            .setPositiveButton("Eliminar") { _, _ ->
+                eliminarMiembroDeGrupo(grupoId, userId)
+                val contenedor = view?.findViewById<LinearLayout>(R.id.contenedorUsuarios)
+                contenedor?.removeView(vista)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun eliminarMiembroDeGrupo(grupoId: String, userId: String) {
+        val ref = FirebaseDatabase.getInstance().getReference("usuariosPorGrupo").child(grupoId).child(userId)
+        ref.removeValue().addOnSuccessListener {
+            Toast.makeText(requireContext(), "Miembro eliminado", Toast.LENGTH_SHORT).show()
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+//    private fun eliminarIntegranteVisual(usuario: Usuario) {
+//        listaUsers.remove(usuario)
+//        adapter.updateData(listaUsers)
+//    }
+
 
     private fun showEditTitleDialog() {
         val builder = android.app.AlertDialog.Builder(requireContext())
