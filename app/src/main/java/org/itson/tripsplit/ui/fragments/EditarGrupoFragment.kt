@@ -31,9 +31,10 @@ class EditarGrupoFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_editar_grupo, container, false)
         btnBack = view.findViewById(R.id.btnBack)
+        val grupoId = arguments?.getString("grupoId") ?: ""
         // Inicializar vistas
         txtTripTitle = view.findViewById(R.id.txtTripTitle)
-        btnEditTitle = view.findViewById(R.id.btnEditTitle)
+        btnEditTitle = view.findViewById(R.id.btnEditGroup)
         memberJuan = view.findViewById(R.id.memberJuan)
         btnDeleteJuan = view.findViewById(R.id.btnDeleteJuan)
         memberDiego = view.findViewById(R.id.memberDiego)
@@ -69,7 +70,7 @@ class EditarGrupoFragment : Fragment() {
         }
         // Lógica para copiar el enlace
         txtCopyLink.setOnClickListener {
-            copyLinkToClipboard("http://example.com") // Cambia con el enlace real
+            copyLinkToClipboard(grupoId)
         }
 
         return view

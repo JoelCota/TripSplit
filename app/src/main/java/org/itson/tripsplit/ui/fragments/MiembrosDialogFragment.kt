@@ -1,30 +1,34 @@
 package org.itson.tripsplit.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.DialogFragment
 import org.itson.tripsplit.R
+import org.itson.tripsplit.data.model.Usuario
+import org.json.JSONObject
 
 class MiembrosDialogFragment : DialogFragment() {
 
-    private var miembros: Array<String>? = null
-    private var selectedMiembros: MutableList<String> = mutableListOf()
+    private var miembros: MutableList<Usuario> = mutableListOf()
+    private val selectedMiembros: MutableList<Usuario> = mutableListOf()
 
     companion object {
         private const val ARG_MIEMBROS = "miembros"
         private const val ARG_MODE = "mode"
 
-        fun newInstance(miembros: Array<String>, mode: String): MiembrosDialogFragment {
+        fun newInstance(miembros: List<Usuario>, mode: String): MiembrosDialogFragment {
             val fragment = MiembrosDialogFragment()
             val args = Bundle()
-            args.putStringArray(ARG_MIEMBROS, miembros)
+            args.putParcelableArrayList(ARG_MIEMBROS, ArrayList(miembros))
             args.putString(ARG_MODE, mode)
             fragment.arguments = args
             return fragment
         }
+
     }
 
     override fun onCreateView(
@@ -33,46 +37,47 @@ class MiembrosDialogFragment : DialogFragment() {
     ): View? {
         val rootView = inflater.inflate(R.layout.dialog_miembros, container, false)
 
-        miembros = arguments?.getStringArray(ARG_MIEMBROS)
+        miembros = arguments?.getParcelableArrayList(ARG_MIEMBROS) ?: mutableListOf()
         val mode = arguments?.getString(ARG_MODE)
+        Log.d("INFO", miembros.toString())
 
         val containerMiembros: LinearLayout = rootView.findViewById(R.id.containerMiembros)
         val btnGuardar: Button = rootView.findViewById(R.id.btnGuardar)
         val btnCerrar: Button = rootView.findViewById(R.id.btnCerrar)
         val txtTitulo: TextView = rootView.findViewById(R.id.txtTitulo)
 
-        // Configurar el título del diálogo
         txtTitulo.text = "Miembros"
         txtTitulo.gravity = View.TEXT_ALIGNMENT_CENTER
 
         if (mode == "single") {
-            btnGuardar.visibility = View.GONE // Ocultar botón "Guardar" en modo único
+            btnGuardar.visibility = View.GONE
 
-            miembros?.forEach { miembro ->
+            miembros.forEach { miembro ->
                 val button = Button(requireContext())
-                button.text = miembro
-                button.setBackgroundColor(resources.getColor(android.R.color.white))
+                button.text = miembro.nombre
+                button.setBackgroundColor(resources.getColor(android.R.color.white, null))
                 button.setOnClickListener {
-                    (targetFragment as? NuevoGastoFragment)?.actualizarPagadoPor(miembro)
-                    // Enviar resultado al fragmento objetivo
-                    val result = Bundle()
-                    result.putString("resultado", miembro)
+                    val result = Bundle().apply {
+                        putParcelable("usuarioSeleccionado", miembro)
+                    }
                     parentFragmentManager.setFragmentResult("pagadoPor", result)
                     dismiss()
                 }
                 containerMiembros.addView(button)
             }
-        } else {
-            btnGuardar.visibility = View.VISIBLE // Mostrar botón "Guardar" en selección múltiple
 
-            miembros?.forEach { miembro ->
+
+        } else {
+            btnGuardar.visibility = View.VISIBLE
+
+            miembros.forEach { usuario ->
                 val checkBox = CheckBox(requireContext())
-                checkBox.text = miembro
+                checkBox.text = usuario.nombre
                 checkBox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        selectedMiembros.add(miembro)
+                        selectedMiembros.add(usuario)
                     } else {
-                        selectedMiembros.remove(miembro)
+                        selectedMiembros.remove(usuario)
                     }
                 }
                 containerMiembros.addView(checkBox)
@@ -81,9 +86,9 @@ class MiembrosDialogFragment : DialogFragment() {
 
         btnGuardar.setOnClickListener {
             if (selectedMiembros.isNotEmpty()) {
-                // Enviar los miembros seleccionados al fragmento objetivo
+                val idsSeleccionados = selectedMiembros.map { it.id }
                 val result = Bundle()
-                result.putStringArrayList("resultado", ArrayList(selectedMiembros))
+                result.putStringArrayList("resultado", ArrayList(idsSeleccionados))
                 parentFragmentManager.setFragmentResult("divididoEntre", result)
                 dismiss()
             } else {
@@ -98,7 +103,6 @@ class MiembrosDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         dialog?.window?.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT

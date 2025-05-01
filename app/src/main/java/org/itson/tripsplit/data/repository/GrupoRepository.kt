@@ -5,15 +5,15 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import org.itson.tripsplit.data.model.Group
-import org.itson.tripsplit.data.model.Expense
+import org.itson.tripsplit.data.model.Grupo
+import org.itson.tripsplit.data.model.Gasto
+import org.itson.tripsplit.data.model.Usuario
 
 import java.util.*
 
 class GrupoRepository {
 
     private val database = FirebaseDatabase.getInstance().reference
-    private val groupsRef = database.child("Groups")
 
     // Función para generar un ID aleatorio de 6 caracteres (letras y números)
     private fun generarIdAleatorio(): String {
@@ -24,138 +24,185 @@ class GrupoRepository {
             .joinToString("")
     }
 
-    // Crear un nuevo grupo con un ID aleatorio
     fun crearGrupo(nombreGrupo: String, userId: String, callback: (Boolean) -> Unit) {
-        val grupoId = generarIdAleatorio() // Usamos el ID aleatorio generado
+        val idGrupo = generarIdAleatorio()
+        val grupo = Grupo(id = idGrupo, nombre = nombreGrupo, idCreador = userId)
 
-        val nuevoGrupo = Group(
-            id = grupoId,
-            name = nombreGrupo,
-            expenses = emptyMap(),
-            members = mapOf(userId to true)
-        )
-
-        // Primero, crear el grupo en la base de datos
-        database.child("Groups").child(grupoId).setValue(nuevoGrupo)
+        // Guardar el grupo
+        database.child("grupos").child(idGrupo).setValue(grupo)
             .addOnSuccessListener {
-                // Una vez que el grupo se crea, agregamos el grupo al usuario
-                val userRef = database.child("Users").child(userId)
-                userRef.child("Groups").child(grupoId).setValue(true)
+                // Agregar al usuario como miembro en usuariosPorGrupo
+                database.child("usuariosPorGrupo").child(idGrupo).child(userId).setValue(true)
                     .addOnSuccessListener {
-                        callback(true)
+                        // Agregar el grupo en el perfil del usuario
+                        database.child("usuarios").child(userId).child("grupos").child(idGrupo).setValue(true)
+                            .addOnSuccessListener { callback(true) }
+                            .addOnFailureListener { callback(false) }
                     }
-                    .addOnFailureListener {
-                        // Fallo al agregar el grupo al usuario
-                        callback(false)
-                    }
+                    .addOnFailureListener { callback(false) }
             }
-            .addOnFailureListener {
-                // Fallo al crear el grupo
-                callback(false)
-            }
-    }
-    // Función para unirse a un grupo
-    fun unirseAGrupo(codigoGrupo: String, userId: String, callback: (Boolean, String?) -> Unit) {
-        val grupoRef = groupsRef.child(codigoGrupo)
-
-        grupoRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    // El grupo existe, agregar al usuario
-                    grupoRef.child("members").child(userId).setValue(true)
-                        .addOnSuccessListener {
-                            // También agregamos el grupo al usuario
-                            val userRef = database.child("Users").child(userId)
-                            userRef.child("Groups").child(codigoGrupo).setValue(true)
-                                .addOnSuccessListener {
-                                    callback(true, "Te has unido al grupo")
-                                }
-                                .addOnFailureListener {
-                                    callback(false, "Error al agregar al usuario al grupo")
-                                }
-                        }
-                        .addOnFailureListener {
-                            callback(false, "Error al agregar al grupo")
-                        }
-                } else {
-                    // El grupo no existe
-                    callback(false, "El código de grupo no es válido")
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                callback(false, "Error al verificar el código del grupo")
-            }
-        })
-    }
-
-    fun getUserGroups(uid: String, callback: (List<Group>) -> Unit) {
-        val userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
-
-        userRef.child("Groups").get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val groups = mutableListOf<Group>()
-                val groupIds = task.result.value as? Map<String, Boolean> ?: emptyMap()
-
-                if (groupIds.isEmpty()) {
-                    callback(emptyList()) // Si no hay grupos, llamamos al callback con lista vacía
-                    return@addOnCompleteListener
-                }
-
-                val groupsRef = FirebaseDatabase.getInstance().getReference("Groups")
-                var loadedGroups = 0  // Contador de grupos cargados
-
-                for (groupId in groupIds.keys) {
-                    groupsRef.child(groupId).get().addOnCompleteListener { groupTask ->
-                        loadedGroups++ // Contamos cada intento de carga
-
-                        if (groupTask.isSuccessful) {
-                            val group = groupTask.result.getValue(Group::class.java)
-                            group?.let { groups.add(it) }
-                        } else {
-                            Log.e("GroupRepository", "Error al obtener grupo $groupId", groupTask.exception)
-                        }
-
-                        // Llamar al callback cuando todas las solicitudes se completen
-                        if (loadedGroups == groupIds.size) {
-                            callback(groups)
-                        }
-                    }
-                }
-            } else {
-                Log.e("UserRepository", "Error al obtener grupos del usuario", task.exception)
-                callback(emptyList()) // Llamamos al callback con lista vacía en caso de error
-            }
-        }
-    }
-
-    // Agregar un gasto a un grupo
-    fun agregarGasto(grupoId: String, gasto: Expense, callback: (Boolean) -> Unit) {
-        val gastoId = groupsRef.child(grupoId).child("expenses").push().key ?: return
-
-        groupsRef.child(grupoId).child("expenses").child(gastoId).setValue(gasto)
-            .addOnSuccessListener { callback(true) }
             .addOnFailureListener { callback(false) }
     }
 
 
-    // Obtener los gastos de un grupo
-    fun obtenerGastos(grupoId: String, callback: (Map<String, Expense>) -> Unit) {
-        database.child("Groups").child(grupoId).child("expenses").addListenerForSingleValueEvent(object : ValueEventListener {
+     fun obtenerUsuariosDeGrupo(grupoId: String, onResultado: (List<Usuario>) -> Unit) {
+        val usuariosRef = database.child("usuariosPorGrupo").child(grupoId)
+        usuariosRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val gastos = mutableMapOf<String, Expense>()
-                for (gastoSnapshot in snapshot.children) {
-                    val gasto = gastoSnapshot.getValue(Expense::class.java)
-                    if (gasto != null) {
-                        gastos[gastoSnapshot.key ?: ""] = gasto
-                    }
+                val listaUsuarios = mutableListOf<Usuario>()
+                val usuariosKeys = snapshot.children.mapNotNull { it.key }
+                var count = 0
+
+                for (uid in usuariosKeys) {
+                    database.child("usuarios").child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(userSnapshot: DataSnapshot) {
+                            val usuario = userSnapshot.getValue(Usuario::class.java)
+                            usuario?.let { listaUsuarios.add(it) }
+                            count++
+                            if (count == usuariosKeys.size) {
+                                onResultado(listaUsuarios)
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            onResultado(emptyList())
+                        }
+                    })
                 }
-                callback(gastos)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                callback(emptyMap())
+                onResultado(emptyList())
             }
         })
+    }
+
+
+
+    fun eliminarGrupo(grupoId: String, callback: (Boolean) -> Unit) {
+        val updates = hashMapOf<String, Any?>(
+            "/grupos/$grupoId" to null,
+            "/usuariosPorGrupo/$grupoId" to null,
+            "/gastosPorGrupo/$grupoId" to null
+        )
+
+        database.updateChildren(updates)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+
+    fun unirseAGrupo(grupoId: String, usuarioId: String, callback: (Boolean, String) -> Unit) {
+        val grupoRef = FirebaseDatabase.getInstance().getReference("grupos").child(grupoId)
+        val usuarioRef = FirebaseDatabase.getInstance().getReference("usuarios").child(usuarioId)
+
+        // Verificamos si el grupo existe
+        grupoRef.get().addOnSuccessListener { grupoSnapshot ->
+            if (grupoSnapshot.exists()) {
+                // El grupo existe, ahora añadimos al usuario al grupo
+                val usuarioEnGrupoRef =
+                    grupoRef.child("usuarios").push() // Usamos push() para agregar un nuevo usuario
+
+                usuarioEnGrupoRef.setValue(usuarioId).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // Ahora actualizamos el grupo en el perfil del usuario
+                        val usuarioGrupoRef =
+                            usuarioRef.child("grupos").push() // Añadimos el ID del grupo al usuario
+                        usuarioGrupoRef.setValue(grupoId).addOnCompleteListener { task2 ->
+                            if (task2.isSuccessful) {
+                                callback(true, "Usuario $usuarioId se unió al grupo $grupoId")
+                            } else {
+                                callback(false, "Error al agregar grupo al perfil del usuario")
+                            }
+                        }
+                    } else {
+                        callback(false, "Error al agregar usuario al grupo")
+                    }
+                }
+            } else {
+                callback(false, "El grupo no existe")
+            }
+        }
+    }
+    fun esUsuarioCreador(grupoId: String, userId: String, callback: (Boolean) -> Unit) {
+        val grupoRef = database.child("grupos").child(grupoId)
+        grupoRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val grupo = snapshot.getValue(Grupo::class.java)
+                val esCreador = grupo?.idCreador == userId
+                callback(esCreador)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(false)
+            }
+        })
+    }
+
+    fun eliminarUsuarioDelGrupo(
+        grupoId: String,
+        usuarioId: String,
+        callback: (Boolean, String) -> Unit
+    ) {
+        val grupoRef = FirebaseDatabase.getInstance().getReference("grupos").child(grupoId)
+        val usuarioRef = FirebaseDatabase.getInstance().getReference("usuarios").child(usuarioId)
+        val usuariosPorGrupoRef =FirebaseDatabase.getInstance().getReference("usuariosPorGrupo").child(grupoId)
+
+        grupoRef.get().addOnSuccessListener { grupoSnapshot ->
+            if (grupoSnapshot.exists()) {
+                val usuariosRef = grupoRef.child("usuarios")
+                usuariosRef.orderByValue().equalTo(usuarioId).get()
+                    .addOnSuccessListener { userSnapshot ->
+                        if (userSnapshot.exists()) {
+                            userSnapshot.children.firstOrNull()?.ref?.removeValue()
+                                ?.addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        val gruposRef = usuarioRef.child("grupos")
+                                        gruposRef.orderByValue().equalTo(grupoId).get()
+                                            .addOnSuccessListener { userGroupsSnapshot ->
+                                                if (userGroupsSnapshot.exists()) {
+                                                    userGroupsSnapshot.children.firstOrNull()?.ref?.removeValue()
+                                                        ?.addOnCompleteListener { task2 ->
+                                                            if (task2.isSuccessful) {
+                                                                usuariosPorGrupoRef.child(usuarioId)
+                                                                    .removeValue()
+                                                                    .addOnCompleteListener { task3 ->
+                                                                        if (task3.isSuccessful) {
+                                                                            callback(
+                                                                                true,
+                                                                                "Usuario $usuarioId eliminado completamente del grupo $grupoId"
+                                                                            )
+                                                                        } else {
+                                                                            callback(
+                                                                                false,
+                                                                                "Error al eliminar usuario de usuariosPorGrupo"
+                                                                            )
+                                                                        }
+                                                                    }
+                                                            } else {
+                                                                callback(
+                                                                    false,
+                                                                    "Error al eliminar el grupo del perfil del usuario"
+                                                                )
+                                                            }
+                                                        }
+                                                } else {
+                                                    callback(
+                                                        false,
+                                                        "El usuario no está en el grupo"
+                                                    )
+                                                }
+                                            }
+                                    } else {
+                                        callback(false, "Error al eliminar usuario del grupo")
+                                    }
+                                }
+                        } else {
+                            callback(false, "El usuario no está en el grupo")
+                        }
+                    }
+            } else {
+                callback(false, "El grupo no existe")
+            }
+        }
     }
 }

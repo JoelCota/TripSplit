@@ -22,12 +22,12 @@ import com.google.firebase.auth.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import org.itson.tripsplit.R
+import org.itson.tripsplit.data.repository.UserRepository
 import org.itson.tripsplit.ui.fragments.CrearGrupoFragment
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,17 +58,21 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val userRepository = UserRepository()
+
         btnLogin.setOnClickListener {
             if (edtEmail.text.isEmpty() || edtPass.text.isEmpty()) {
-                Toast.makeText(
-                    baseContext,
-                    "Todos los campos deben estar llenos.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }  else {
-                login(edtEmail.text.toString().trim(), edtPass.text.toString())
+                Toast.makeText(this, "Todos los campos deben estar llenos.", Toast.LENGTH_SHORT).show()
+            } else {
+                userRepository.login(
+                    edtEmail.text.toString().trim(),
+                    edtPass.text.toString(),
+                    onSuccess = { user -> goToMain(user) },
+                    onError = { error -> Toast.makeText(this, error, Toast.LENGTH_SHORT).show() }
+                )
             }
         }
+
 
         var isPasswordVisible = false
         edtPass.setOnTouchListener { v, event ->
@@ -109,37 +113,5 @@ class LoginActivity : AppCompatActivity() {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
-
-    fun login(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    goToMain(user!!)
-                } else {
-                    Toast.makeText(
-                        baseContext,
-                        "Usuario y/o contraseña equivocados",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-    }
-
-//    private fun verificarGrupos(userId: String) {
-//        val userGroupsRef = database.child("Grupos").orderByChild("creadorId").equalTo(userId)
-//
-//        userGroupsRef.get().addOnSuccessListener { snapshot ->
-//            if (!snapshot.exists()) {
-//                // Si el usuario no tiene grupos, enviar señal para ir a CrearGrupoFragment
-//                val intent = Intent(this, MainActivity::class.java)
-//                intent.putExtra("ir_a_crear_grupo", true)
-//                startActivity(intent)
-//                finish()
-//            }
-//        }.addOnFailureListener {
-//            Toast.makeText(this, "Error al verificar grupos", Toast.LENGTH_SHORT).show()
-//        }
-//    }
 
 }

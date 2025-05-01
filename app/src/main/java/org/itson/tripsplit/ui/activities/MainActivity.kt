@@ -6,35 +6,34 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
 import org.itson.tripsplit.R
-import org.itson.tripsplit.data.model.User
+import org.itson.tripsplit.data.model.Gasto
+import org.itson.tripsplit.data.model.Grupo
+import org.itson.tripsplit.data.model.Usuario
 import org.itson.tripsplit.data.repository.GrupoRepository
 import org.itson.tripsplit.data.repository.UserRepository
 import org.itson.tripsplit.ui.fragments.GruposFragment
 import org.itson.tripsplit.ui.fragments.SinGruposFragment
 import org.itson.tripsplit.ui.fragments.CuentaFragment
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
-    private var currentUser: User? = null
+    private var currentUser: Usuario? = null
     private val userRepository = UserRepository()
-    private val grupoRepository = GrupoRepository()
-
+    val database = FirebaseDatabase.getInstance()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-
-        // Cargar datos del usuario
         loadUserData()
-
-        // Encuentra el BottomNavigationView
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-
-        // Configura el listener para el BottomNavigationView
         bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_grupos -> {
@@ -48,7 +47,6 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
         verificarGrupos()
     }
 
@@ -64,9 +62,8 @@ class MainActivity : AppCompatActivity() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         Log.d("DEBUG", "Verificando grupos para usuario: $userId")
 
-        grupoRepository.getUserGroups(userId) { grupos ->
+        userRepository.getUserGroups(userId) { grupos ->
             Log.d("DEBUG", "Cantidad de grupos obtenidos: ${grupos.size}")
-
             if (grupos.isNotEmpty()) {
                 Log.d("DEBUG", "Mostrando GruposFragment")
                 replaceFragment(GruposFragment())
@@ -76,7 +73,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     fun loadUserData() {
         val auth = FirebaseAuth.getInstance()
         val uid = auth.currentUser?.uid ?: return
@@ -85,9 +81,8 @@ class MainActivity : AppCompatActivity() {
         userRepository.getUser(uid) { user ->
             if (user != null) {
                 // Mostrar un mensaje de bienvenida si el usuario es encontrado
-                Toast.makeText(baseContext, "Bienvenido/a: " + user.name, Toast.LENGTH_SHORT).show()
+                Toast.makeText(baseContext, "Bienvenido/a: " + user.nombre, Toast.LENGTH_SHORT).show()
                 currentUser = user
-
                 Log.d("INFO", "Sesión iniciada: " + user.toString())
 
             } else {

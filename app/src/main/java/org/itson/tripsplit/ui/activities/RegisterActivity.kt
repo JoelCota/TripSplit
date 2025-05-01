@@ -21,7 +21,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.FirebaseDatabase
 import org.itson.tripsplit.R
-import org.itson.tripsplit.data.model.User
+import org.itson.tripsplit.data.model.Usuario
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -152,12 +152,12 @@ class RegisterActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val uid : String = auth.currentUser?.uid!!
-                    val user = User(
+                    val user = Usuario(
                         uid,
-                        email,
-                        name
+                        name,
+                        email
                     )
-                    val userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
+                    val userRef = FirebaseDatabase.getInstance().getReference("usuarios").child(uid)
 
                     userRef.setValue(user).addOnSuccessListener {
                         Toast.makeText(

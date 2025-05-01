@@ -7,5 +7,6 @@ data class Gasto(
     var categoria: String = "",
     var moneda: String = "USD",
     var pagadoPor: Usuario? = null,
-    var divididoEntre: List<Usuario> = emptyList()
+    var divididoEntre: List<Usuario> = emptyList(),
+    var fecha: String=""
 )

@@ -67,7 +67,7 @@
                 android:contentDescription="Seleccionar Categoría" />
 
             <EditText
-                android:id="@+id/edtGasto"
+                android:id="@+id/edtNombreGasto"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"

@@ -8,17 +8,18 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import org.itson.tripsplit.R
 import org.itson.tripsplit.data.repository.GrupoRepository
 import org.itson.tripsplit.databinding.FragmentGruposBinding
-import org.itson.tripsplit.data.model.Group
+import org.itson.tripsplit.data.model.Grupo
+import org.itson.tripsplit.data.repository.UserRepository
 
 class GruposFragment : Fragment() {
 
     private lateinit var binding: FragmentGruposBinding
     private val grupoRepository = GrupoRepository()
+    private val userRepository = UserRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +33,6 @@ class GruposFragment : Fragment() {
             mostrarPopupMenu(view)
         }
 
-        // Cargar los grupos
         cargarGrupos()
 
         return binding.root
@@ -40,7 +40,7 @@ class GruposFragment : Fragment() {
 
     private fun cargarGrupos() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        grupoRepository.getUserGroups(userId) { grupos ->
+        userRepository.getUserGroups(userId) { grupos ->
             if (grupos.isEmpty()) {
                 Toast.makeText(context, "No hay grupos disponibles", Toast.LENGTH_SHORT).show()
             } else {
@@ -49,7 +49,7 @@ class GruposFragment : Fragment() {
         }
     }
 
-    private fun mostrarGrupos(grupos: List<Group>) {
+    private fun mostrarGrupos(grupos: List<Grupo>) {
         val linearLayoutGroups = binding.linearLayoutGroups
         linearLayoutGroups.removeAllViews()
 
@@ -60,17 +60,21 @@ class GruposFragment : Fragment() {
             val groupIdTextView: TextView = groupView.findViewById(R.id.group_id)
             val groupDescriptionTextView: TextView = groupView.findViewById(R.id.group_description)
             val gastosTextView: TextView = groupView.findViewById(R.id.gastos)
-
-            groupNameTextView.text = grupo.name
+            groupNameTextView.text = grupo.nombre
             groupIdTextView.text = "#${grupo.id}"
             groupDescriptionTextView.text = "Han gastado $0.00"
             gastosTextView.text = "Te deben $0.00"
-
             groupView.setOnClickListener {
-                val bundle = Bundle()
-                bundle.putString("grupoId", grupo.id)
+                val bundle = Bundle().apply {
+                    putString("grupoId", grupo.id)
+                }
+
+                val detalleFragment = GruposDetailFragment().apply {
+                    arguments = bundle
+                }
+
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainer, GruposDetailFragment())
+                    .replace(R.id.fragmentContainer, detalleFragment)
                     .addToBackStack(null)
                     .commit()
             }
