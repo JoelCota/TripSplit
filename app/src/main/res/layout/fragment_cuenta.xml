@@ -20,12 +20,12 @@
         android:paddingEnd="16dp">
 
         <TextView
+            android:id="@+id/txtNombreUsuario"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/inter"
             android:paddingLeft="10dp"
-            android:text="Alma Leticia Chavez "
             android:textColor="@android:color/white"
             android:textSize="32sp"
             android:textStyle="bold" />

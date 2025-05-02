@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
 import org.itson.tripsplit.R
 import org.itson.tripsplit.data.repository.UserRepository
 import org.itson.tripsplit.ui.activities.LoginActivity
@@ -34,5 +36,24 @@ class CuentaFragment : Fragment() {
         }
 
         return rootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val txtNombre: TextView = view.findViewById(R.id.txtNombreUsuario)
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (userId != null) {
+            userRepository.getUser(userId) { user ->
+                if (user != null) {
+                    txtNombre.text  = "Hola, ${user.nombre}"
+                } else {
+                    txtNombre.text = "Usuario no encontrado"
+                }
+            }
+        } else {
+            txtNombre.text = "Usuario no autenticado"
+        }
     }
 }
