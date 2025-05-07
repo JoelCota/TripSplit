@@ -1,18 +1,24 @@
 package org.itson.tripsplit.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.database.FirebaseDatabase
 import org.itson.tripsplit.R
+import org.itson.tripsplit.data.repository.GrupoRepository
 
 class GruposDetailFragment : Fragment() {
 
     private lateinit var btnEditTitle: ImageButton
     private lateinit var btnBack: ImageButton
+    private lateinit var txtTripTitle: TextView
+    private val databaseRef = FirebaseDatabase.getInstance().getReference("grupos")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,5 +58,20 @@ class GruposDetailFragment : Fragment() {
 
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        txtTripTitle = view.findViewById(R.id.txtTripTitle)
+        val grupoId = arguments?.getString("grupoId")
+        if (grupoId != null) {
+            val grupoRepository = GrupoRepository()
+            grupoRepository.getNombreGrupo(grupoId) { nombreGrupo ->
+                if(nombreGrupo != null){
+                    txtTripTitle.text = nombreGrupo
+                }
+            }
+        }
     }
 }

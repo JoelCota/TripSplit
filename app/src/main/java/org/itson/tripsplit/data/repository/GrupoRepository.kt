@@ -1,6 +1,7 @@
 package org.itson.tripsplit.data.repository
 
 import android.util.Log
+import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -74,6 +75,17 @@ class GrupoRepository {
                 onResultado(emptyList())
             }
         })
+    }
+
+    fun getNombreGrupo(grupoId: String, callback: (String?) -> Unit) {
+        val grupoRef = FirebaseDatabase.getInstance().getReference("grupos").child(grupoId)
+
+        grupoRef.child("nombre").get().addOnSuccessListener { task ->
+            val nombre = task.value as? String
+            callback(nombre)
+        }.addOnFailureListener {
+            callback(null)
+        }
     }
 
 

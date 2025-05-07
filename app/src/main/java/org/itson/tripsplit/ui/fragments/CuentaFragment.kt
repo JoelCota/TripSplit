@@ -124,7 +124,7 @@ class CuentaFragment : Fragment() {
 
         val txtNombre: TextView = view.findViewById(R.id.txtNombreUsuario)
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        
+
 
         if (userId != null) {
             userRepository.getUser(userId) { user ->

@@ -85,6 +85,14 @@ class EditarGrupoFragment : Fragment() {
 
         // Cargar los miembros del grupo
         cargarMiembrosGrupo()
+
+        // Cargar el título del grupo
+        val grupoRepository = GrupoRepository()
+        grupoRepository.getNombreGrupo(groupId) { nombreGrupo ->
+            if (nombreGrupo != null) {
+                txtTripTitle.text = nombreGrupo
+            }
+        }
     }
 
     private fun cargarAvatarUsuario(userId: String, imageView: ImageView) {
