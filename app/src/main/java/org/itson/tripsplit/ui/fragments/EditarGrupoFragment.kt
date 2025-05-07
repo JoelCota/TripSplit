@@ -12,10 +12,12 @@ import androidx.appcompat.app.AlertDialog
 import android.content.ClipboardManager
 import android.content.Context
 import android.util.Log
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -85,6 +87,27 @@ class EditarGrupoFragment : Fragment() {
         cargarMiembrosGrupo()
     }
 
+    private fun cargarAvatarUsuario(userId: String, imageView: ImageView) {
+        val userRef = FirebaseDatabase.getInstance().getReference("usuarios").child(userId)
+
+        userRef.child("imagenURL").get().addOnSuccessListener { dataSnapshot ->
+            val imageUrl = dataSnapshot.value as? String
+
+            if (!imageUrl.isNullOrEmpty()) {
+                Glide.with(imageView)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.ic_account)
+                    .error(R.drawable.ic_account)
+                    .into(imageView)
+            } else {
+                imageView.setImageResource(R.drawable.ic_account)
+            }
+        }.addOnFailureListener { error ->
+            Log.e("Firebase", "Error al obtener imagenURL de $userId: $error")
+            imageView.setImageResource(R.drawable.ic_account)
+        }
+    }
+
     private fun cargarMiembrosGrupo() {
         val grupoId = arguments?.getString("grupoId") ?: return
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -102,6 +125,7 @@ class EditarGrupoFragment : Fragment() {
 
                     val txtNombre = vistaMiembro.findViewById<TextView>(R.id.member)
                     val btnEliminar = vistaMiembro.findViewById<ImageButton>(R.id.btnDeleteUser)
+                    val imgAvatarUser = vistaMiembro.findViewById<ImageView>(R.id.imgAvatarUser)
 
                     txtNombre.text = usuario.nombre
 
@@ -111,6 +135,8 @@ class EditarGrupoFragment : Fragment() {
                     btnEliminar.setOnClickListener {
                         mostrarDialogoConfirmacion(usuario.id, grupoId, vistaMiembro)
                     }
+
+                    cargarAvatarUsuario(usuario.id, imgAvatarUser)
 
                     layoutContenedor?.addView(vistaMiembro)
                 }

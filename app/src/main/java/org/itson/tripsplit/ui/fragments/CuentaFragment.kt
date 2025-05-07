@@ -40,7 +40,6 @@ class CuentaFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_cuenta, container, false)
 
         userRepository = UserRepository()
-        initCloudinary()
 
         val btnLogout: Button = rootView.findViewById(R.id.btnCerrarSesion)
         imgAvatar = rootView.findViewById(R.id.imgAvatar)
@@ -97,10 +96,23 @@ class CuentaFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_GET && resultCode == Activity.RESULT_OK){
-            val fullPhotoUri: Uri? = data?.data
-            fullPhotoUri?.let {
+            val imageUri = data?.data
+            imageUri?.let {
                 changeImage(it)
-                uploadImage(it)
+
+                uploadImage(it, object : UploadCallback {
+                    override fun onUploadSuccess(url: String) {
+                        // Guardar en Firebase
+                        val uid = FirebaseAuth.getInstance().currentUser?.uid
+                        uid?.let {
+                            updateProfileImageUrl(uid, url)
+                        }
+                    }
+
+                    override fun onUploadError(error: String) {
+                        Toast.makeText(requireContext(), "Error al subir imagen: $error", Toast.LENGTH_LONG).show()
+                    }
+                })
             }
         }
     }
@@ -112,6 +124,7 @@ class CuentaFragment : Fragment() {
 
         val txtNombre: TextView = view.findViewById(R.id.txtNombreUsuario)
         val userId = FirebaseAuth.getInstance().currentUser?.uid
+        
 
         if (userId != null) {
             userRepository.getUser(userId) { user ->
@@ -126,41 +139,42 @@ class CuentaFragment : Fragment() {
         }
     }
 
-    private fun initCloudinary() {
-        val config: MutableMap<String, String> = HashMap<String, String>()
-        config["TripSplit"] = CLOUD_NAME
-        MediaManager.init(requireContext(), config)
+    interface UploadCallback {
+        fun onUploadSuccess(url: String)
+        fun onUploadError(error: String)
     }
 
-    fun uploadImage(uri: Uri) {
-        var url: String = ""
-        if (imageUri != null){
-            MediaManager.get().upload(imageUri).unsigned(UPLOAD_PRESET).callback(object :
-                UploadCallback{
+    fun uploadImage(uri: Uri, callback: UploadCallback) {
+        if (uri != null) {
+            MediaManager.get().upload(uri).unsigned(UPLOAD_PRESET).callback(object :
+                com.cloudinary.android.callback.UploadCallback {
                 override fun onStart(requestId: String?) {
-                    Log.d("Cloudinary QuickStart", "Upload start")
+                    Log.d("Cloudinary", "Upload start")
                 }
 
                 override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {
-                    Log.d("Cloudinary QuickStart", "Upload progress")
+                    Log.d("Cloudinary", "Upload progress")
                 }
 
                 override fun onSuccess(requestId: String?, resultData: MutableMap<Any?, Any?>?) {
-                    Log.d("Cloudinary QuickStart", "Upload success")
-                    val uid = FirebaseAuth.getInstance().currentUser?.uid
-                    url = resultData?.get("secure_url") as String? ?: ""
-                    uid?.let { updateProfileImageUrl(uid, url) }
-                    Log.d("URL}", url)
+                    Log.d("Cloudinary", "Upload success")
+                    val url = resultData?.get("secure_url") as String? ?: ""
+                    if (url.isNotEmpty()) {
+                        callback.onUploadSuccess(url)
+                    } else {
+                        callback.onUploadError("Empty URL from Cloudinary")
+                    }
                 }
 
                 override fun onError(requestId: String?, error: ErrorInfo?) {
-                    Log.d("Cloudinary QuickStart", "Upload error")
+                    Log.e("Cloudinary", "Upload error: ${error?.description}")
+                    callback.onUploadError(error?.description ?: "Unknown error")
                 }
 
-                override fun onReschedule(requestId: String?, error: ErrorInfo?) {
-
-                }
-            })
+                override fun onReschedule(requestId: String?, error: ErrorInfo?) {}
+            }).dispatch()
+        } else {
+            callback.onUploadError("No image selected")
         }
     }
 
