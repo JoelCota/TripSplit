@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.GenericTypeIndicator
 import org.itson.tripsplit.data.model.Grupo
 import org.itson.tripsplit.data.model.Usuario
 
@@ -62,24 +63,19 @@ class UserRepository {
             if (task.isSuccessful) {
                 val groups = mutableListOf<Grupo>()
                 val groupIds = task.result.value as? Map<String, Boolean> ?: emptyMap()
-
                 if (groupIds.isEmpty()) {
                     callback(emptyList())
                     return@addOnCompleteListener
                 }
-
                 val groupsRef = FirebaseDatabase.getInstance().getReference("grupos")
                 var loadedGroups = 0
-
                 for (groupId in groupIds.keys) {
                     groupsRef.child(groupId).get().addOnCompleteListener { groupTask ->
                         loadedGroups++
-
                         if (groupTask.isSuccessful) {
                             val group = groupTask.result.getValue(Grupo::class.java)
                             group?.let { groups.add(it) }
                         }
-
                         if (loadedGroups == groupIds.size) {
                             callback(groups)
                         }

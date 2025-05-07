@@ -30,12 +30,32 @@
             android:textSize="32sp"
             android:textStyle="bold" />
 
-        <!-- Fotografía del lado derecho -->
-        <ImageView
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:layout_margin="25dp"
-            android:src="@drawable/ic_account" /> <!-- Reemplaza ic_profile con tu imagen -->
+
+        <!-- Contenedor vertical para imagen y botón -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- Fotografía del lado derecho -->
+            <ImageView
+                android:id="@+id/imgAvatar"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_margin="8dp"
+                android:src="@drawable/ic_account" />
+
+            <!-- Botón para subir imagen -->
+            <Button
+                android:id="@+id/btnCambiarAvatar"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:text="Subir imagen"
+                android:textSize="12sp"
+                android:padding="2dp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
 
     </LinearLayout>
 

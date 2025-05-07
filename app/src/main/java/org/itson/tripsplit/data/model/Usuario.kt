@@ -8,4 +8,5 @@ data class Usuario(
     var id: String = "",
     var nombre: String = "",
     var email: String = "",
+    var imagenUrl: String = ""
 ): Parcelable

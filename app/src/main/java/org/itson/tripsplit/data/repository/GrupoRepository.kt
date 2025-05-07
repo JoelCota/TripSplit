@@ -44,7 +44,6 @@ class GrupoRepository {
             .addOnFailureListener { callback(false) }
     }
 
-
      fun obtenerUsuariosDeGrupo(grupoId: String, onResultado: (List<Usuario>) -> Unit) {
         val usuariosRef = database.child("usuariosPorGrupo").child(grupoId)
         usuariosRef.addListenerForSingleValueEvent(object : ValueEventListener {

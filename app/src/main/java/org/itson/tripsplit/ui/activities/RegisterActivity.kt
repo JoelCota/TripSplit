@@ -152,10 +152,12 @@ class RegisterActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val uid : String = auth.currentUser?.uid!!
+                    val imagenURL: String = ""
                     val user = Usuario(
                         uid,
                         name,
-                        email
+                        email,
+                        imagenURL
                     )
                     val userRef = FirebaseDatabase.getInstance().getReference("usuarios").child(uid)
 
