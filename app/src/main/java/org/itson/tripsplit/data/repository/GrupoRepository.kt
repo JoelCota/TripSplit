@@ -1,7 +1,6 @@
 package org.itson.tripsplit.data.repository
 
 import android.util.Log
-import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -44,6 +43,7 @@ class GrupoRepository {
             }
             .addOnFailureListener { callback(false) }
     }
+
 
      fun obtenerUsuariosDeGrupo(grupoId: String, onResultado: (List<Usuario>) -> Unit) {
         val usuariosRef = database.child("usuariosPorGrupo").child(grupoId)
@@ -88,6 +88,30 @@ class GrupoRepository {
         }
     }
 
+    fun obtenerGastosPorGrupo(grupoId: String, onResultado: (List<Gasto>) -> Unit) {
+        val grupoRef = database.child("gastosPorGrupo").child(grupoId)
+
+        grupoRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val listaGastos = mutableListOf<Gasto>()
+
+                for (gastoSnapshot in snapshot.children) {
+                    val gasto = gastoSnapshot.getValue(Gasto::class.java)
+                    if (gasto != null) {
+                        listaGastos.add(gasto)
+                    }
+                }
+
+                onResultado(listaGastos)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onResultado(emptyList()) // o manejar error como prefieras
+            }
+        })
+    }
+
+
 
 
     fun eliminarGrupo(grupoId: String, callback: (Boolean) -> Unit) {
@@ -103,37 +127,44 @@ class GrupoRepository {
     }
 
     fun unirseAGrupo(grupoId: String, usuarioId: String, callback: (Boolean, String) -> Unit) {
-        val grupoRef = FirebaseDatabase.getInstance().getReference("grupos").child(grupoId)
-        val usuarioRef = FirebaseDatabase.getInstance().getReference("usuarios").child(usuarioId)
+        val database = FirebaseDatabase.getInstance().reference
+        val grupoRef = database.child("grupos").child(grupoId)
+        val usuarioRef = database.child("usuarios").child(usuarioId)
 
-        // Verificamos si el grupo existe
+        // Verificar si el grupo existe
         grupoRef.get().addOnSuccessListener { grupoSnapshot ->
             if (grupoSnapshot.exists()) {
-                // El grupo existe, ahora añadimos al usuario al grupo
-                val usuarioEnGrupoRef =
-                    grupoRef.child("usuarios").push() // Usamos push() para agregar un nuevo usuario
-
-                usuarioEnGrupoRef.setValue(usuarioId).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        // Ahora actualizamos el grupo en el perfil del usuario
-                        val usuarioGrupoRef =
-                            usuarioRef.child("grupos").push() // Añadimos el ID del grupo al usuario
-                        usuarioGrupoRef.setValue(grupoId).addOnCompleteListener { task2 ->
-                            if (task2.isSuccessful) {
-                                callback(true, "Usuario $usuarioId se unió al grupo $grupoId")
-                            } else {
-                                callback(false, "Error al agregar grupo al perfil del usuario")
-                            }
+                // Verificar si el usuario ya es parte del grupo
+                database.child("usuariosPorGrupo").child(grupoId).child(usuarioId).get()
+                    .addOnSuccessListener { miembroSnapshot ->
+                        if (miembroSnapshot.exists()) {
+                            callback(false, "El usuario ya es miembro del grupo")
+                        } else {
+                            // Agregar usuario al grupo
+                            database.child("usuariosPorGrupo").child(grupoId).child(usuarioId).setValue(true)
+                                .addOnSuccessListener {
+                                    // Agregar grupo al perfil del usuario
+                                    database.child("usuarios").child(usuarioId).child("grupos").child(grupoId).setValue(true)
+                                        .addOnSuccessListener {
+                                            callback(true, "Usuario $usuarioId se unió al grupo $grupoId")
+                                        }
+                                        .addOnFailureListener {
+                                            callback(false, "Error al agregar grupo al perfil del usuario")
+                                        }
+                                }
+                                .addOnFailureListener {
+                                    callback(false, "Error al agregar usuario al grupo")
+                                }
                         }
-                    } else {
-                        callback(false, "Error al agregar usuario al grupo")
                     }
-                }
             } else {
                 callback(false, "El grupo no existe")
             }
+        }.addOnFailureListener {
+            callback(false, "Error al verificar existencia del grupo")
         }
     }
+
     fun esUsuarioCreador(grupoId: String, userId: String, callback: (Boolean) -> Unit) {
         val grupoRef = database.child("grupos").child(grupoId)
         grupoRef.addListenerForSingleValueEvent(object : ValueEventListener {

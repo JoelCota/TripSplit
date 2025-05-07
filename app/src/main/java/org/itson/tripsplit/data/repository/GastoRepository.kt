@@ -57,4 +57,26 @@ class GastoRepository {
                 onComplete(task.isSuccessful)
             }
     }
+
+    fun obtenerTotalGastado(grupoId: String, callback: (Double) -> Unit) {
+        val gastosRef = database.child("gastosPorGrupo").child(grupoId)
+        println(gastosRef)
+        gastosRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var total = 0.0
+                for (gastoSnap in snapshot.children) {
+                    val gasto = gastoSnap.getValue(Gasto::class.java)
+                    if (gasto != null) {
+                        total += gasto.cantidad
+                    }
+                }
+                callback(total)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(0.0)
+            }
+        })
+    }
+
 }
