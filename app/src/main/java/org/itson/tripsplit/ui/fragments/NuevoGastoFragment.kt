@@ -42,7 +42,7 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
 
     private var categorySelected : String = "General"
     private lateinit var paidBy : Usuario
-
+    private var monedaSeleccionada: String = "USD"
     private lateinit var miembros: List<Usuario>
     private lateinit var divididosEntre: List<Usuario>
     private val monedas = arrayOf("USD", "MXN", "EUR")
@@ -51,10 +51,8 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        var monedaSeleccionada: String = "USD"
         val rootView = inflater.inflate(R.layout.fragment_nuevo_gasto, container, false)
         val grupoId = arguments?.getString("grupoId") ?: ""
-        Log.d(" ID NUEVO GASTO", grupoId)
         edtNombre=rootView.findViewById(R.id.edtNombreGasto)
         edtCantidad=rootView.findViewById(R.id.edtCantidad)
         txtPagadoPor = rootView.findViewById(R.id.txtPagadoPor)
@@ -69,7 +67,6 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
             grupoId = grupoId ,
             onResultado = { usuarios ->
                 miembros = usuarios
-                Log.d("INFO GASTO", usuarios.toString())
                 divididosEntre = usuarios // Selección por defecto: todos
             }
         )
@@ -88,27 +85,19 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
 
         // Click en "Pagado por"
         txtPagadoPor.setOnClickListener {
-            Log.d("NuevoGastoFragment", "PagadoPor")
             val dialog = MiembrosDialogFragment.newInstance(miembros, "single")
             dialog.show(parentFragmentManager, "MiembrosDialogFragment")
         }
 
         // Click en "Dividido entre"
         txtDivididoEntre.setOnClickListener {
-            Log.d("NuevoGastoFragment", "dividido entre")
             val dialogMultiple = MiembrosDialogFragment.newInstance(miembros, "multiple")
             dialogMultiple.show(parentFragmentManager, "MiembrosDialogFragment")
         }
 
         btnSetCurrency.setOnClickListener {
             val dialog =
-                ListaSeleccionDialogFragment.newInstance(monedas, "Seleccionar Moneda", object : ListaSeleccionDialogFragment.OnItemSelectedListener {
-                    override fun onItemSelected(item: String) {
-                        monedaSeleccionada = item
-                        txtMoneda.text = item
-                        Log.d("MonedaSeleccionada", "Moneda seleccionada: $item")
-                    }
-                })
+                ListaSeleccionDialogFragment.newInstance(monedas, "Seleccionar Moneda",this)
             dialog.show(parentFragmentManager, "currencyDialog")
         }
         btnGuardar.setOnClickListener {
@@ -132,7 +121,10 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
                     grupoId, gasto){
                         success ->
                     if (success) {
-                        // Si el gasto se agrega correctamente
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentContainer, GruposFragment())
+                            .addToBackStack(null)
+                            .commit()
                         println("Gasto agregado con éxito")
                     } else {
                         // Si algo falló
@@ -184,12 +176,13 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
     override fun onItemSelected(item: String) {
         when {
             monedas.contains(item) -> {
-                txtMoneda.text = item
+                monedaSeleccionada=item
+                txtMoneda.text ="Moneda: " + item
                 Toast.makeText(requireContext(), "Moneda seleccionada: $item", Toast.LENGTH_SHORT).show()
             }
             categorias.contains(item) -> {
                 categorySelected=item
-                txtCategoria.text = item
+                txtCategoria.text ="Categoria: " + item
                 Toast.makeText(requireContext(), "Categoría seleccionada: $item", Toast.LENGTH_SHORT).show()
             }
         }
