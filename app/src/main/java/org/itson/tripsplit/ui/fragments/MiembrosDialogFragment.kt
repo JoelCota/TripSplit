@@ -10,6 +10,7 @@ import androidx.fragment.app.DialogFragment
 import org.itson.tripsplit.R
 import org.itson.tripsplit.data.model.Usuario
 import org.json.JSONObject
+import org.w3c.dom.Text
 
 class MiembrosDialogFragment : DialogFragment() {
 
@@ -39,12 +40,16 @@ class MiembrosDialogFragment : DialogFragment() {
 
         miembros = arguments?.getParcelableArrayList(ARG_MIEMBROS) ?: mutableListOf()
         val mode = arguments?.getString(ARG_MODE)
-        Log.d("INFO", miembros.toString())
+        Log.d("NuenoGastoINFO", miembros.size.toString())
 
         val containerMiembros: LinearLayout = rootView.findViewById(R.id.containerMiembros)
         val btnGuardar: Button = rootView.findViewById(R.id.btnGuardar)
         val btnCerrar: Button = rootView.findViewById(R.id.btnCerrar)
         val txtTitulo: TextView = rootView.findViewById(R.id.txtTitulo)
+        val txtMembers: TextView= rootView.findViewById(R.id.txtMembers)
+        if (miembros.size==1){
+            txtMembers.visibility=View.INVISIBLE
+        }
 
         txtTitulo.text = "Miembros"
         txtTitulo.gravity = View.TEXT_ALIGNMENT_CENTER

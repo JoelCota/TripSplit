@@ -18,7 +18,6 @@ import org.itson.tripsplit.data.repository.UserRepository
 class GruposFragment : Fragment() {
 
     private lateinit var binding: FragmentGruposBinding
-    private val grupoRepository = GrupoRepository()
     private val userRepository = UserRepository()
 
     override fun onCreateView(
@@ -57,11 +56,9 @@ class GruposFragment : Fragment() {
             val groupView = LayoutInflater.from(context).inflate(R.layout.list_item_group, linearLayoutGroups, false)
 
             val groupNameTextView: TextView = groupView.findViewById(R.id.group_name)
-            val groupIdTextView: TextView = groupView.findViewById(R.id.group_id)
             val groupDescriptionTextView: TextView = groupView.findViewById(R.id.group_description)
             val gastosTextView: TextView = groupView.findViewById(R.id.gastos)
             groupNameTextView.text = grupo.nombre
-            groupIdTextView.text = "#${grupo.id}"
             groupDescriptionTextView.text = "Han gastado $0.00"
             gastosTextView.text = "Te deben $0.00"
             groupView.setOnClickListener {

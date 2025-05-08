@@ -63,7 +63,9 @@
             android:layout_height="wrap_content"
             android:hint="Introduce el nombre del grupo"
             android:padding="10dp"
-            android:inputType="text"/>
+            android:inputType="text"
+            android:maxLength="15"
+            />
 
         <Button
             android:id="@+id/btnCrearGrupo"

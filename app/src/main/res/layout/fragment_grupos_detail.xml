@@ -38,8 +38,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:text=" "
+                android:gravity="left|clip_horizontal"
+                android:text=""
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/title_font_size"
                 android:textStyle="bold" />
@@ -54,7 +54,6 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Contenedor con peso para empujar el botón hacia abajo -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -127,6 +126,7 @@
                     android:layout_marginEnd="16dp"/>
 
                 <TextView
+                    android:id="@+id/btnReporteGastos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Reporte Gastos"
