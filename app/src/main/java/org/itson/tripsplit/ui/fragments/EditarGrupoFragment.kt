@@ -1,5 +1,6 @@
 package org.itson.tripsplit.ui.fragments
 
+import android.content.ClipData
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -128,6 +129,11 @@ class EditarGrupoFragment : Fragment() {
                 txtTripTitle.text = nombreGrupo
             }
         }
+
+        val txtCopyLink = view.findViewById<TextView>(R.id.txtCopyLink)
+        txtCopyLink.setOnClickListener {
+            onCopyLinkClick(it)
+        }
     }
     private fun irAGruposFragment() {
         val fragmentManager = requireActivity().supportFragmentManager
@@ -137,6 +143,19 @@ class EditarGrupoFragment : Fragment() {
         transaction.replace(R.id.fragmentContainer, GruposFragment())
         transaction.addToBackStack(null) // Opcional: permite volver atrás
         transaction.commit()
+    }
+
+    fun onCopyLinkClick(view: View) {
+        val grupoId = arguments?.getString("grupoId") ?: run {
+            Toast.makeText(requireContext(), "No hay ID de grupo", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("ID del Grupo", grupoId)
+
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(requireContext(), "ID copiado: $grupoId", Toast.LENGTH_SHORT).show()
     }
 
     private fun cargarAvatarUsuario(userId: String, imageView: ImageView) {
