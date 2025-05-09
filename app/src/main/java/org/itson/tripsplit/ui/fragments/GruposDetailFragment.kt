@@ -17,6 +17,9 @@ import org.itson.tripsplit.data.adapter.GastoAdapter
 import org.itson.tripsplit.data.model.Gasto
 import org.itson.tripsplit.data.repository.GrupoRepository
 import org.itson.tripsplit.repository.GastoRepository
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class GruposDetailFragment : Fragment() {
 
@@ -114,6 +117,14 @@ class GruposDetailFragment : Fragment() {
                 }
             }
         }
+
+        val textViewMesActual = view.findViewById<TextView>(R.id.textMesGasto)
+        actualizarMesActual(textViewMesActual)
+    }
+    private fun actualizarMesActual(textView: TextView) {
+        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+        val fechaActual = Date()
+        textView.text = dateFormat.format(fechaActual).capitalize()
     }
     private fun mostrarTotalGastos(grupoId: String){
         val gastoRepo = GastoRepository()

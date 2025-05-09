@@ -12,7 +12,7 @@ class VerificarCloudinary : Application() {
         super.onCreate()
         if (!isCloudinaryInitialized) {
             val config = HashMap<String, String>()
-            config["cloud_name"] = "tu-cloud-name"
+            config["cloud_name"] = "dw8yxze4m"
             MediaManager.init(this, config)
             isCloudinaryInitialized = true
         }
