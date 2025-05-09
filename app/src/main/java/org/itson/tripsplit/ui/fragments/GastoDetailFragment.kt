@@ -2,6 +2,7 @@ package org.itson.tripsplit.ui.fragments
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.MultiAutoCompleteTextView
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
@@ -148,55 +150,81 @@ class GastoDetailFragment : Fragment() {
 
         val inputNombre = view.findViewById<EditText>(R.id.editTextNombreGasto)
         val inputCantidad = view.findViewById<EditText>(R.id.editTextCantidadGasto)
-        val inputPagadoPor = view.findViewById<AutoCompleteTextView>(R.id.editTextPagadoPor)
-        val inputDivididoEntre = view.findViewById<MultiAutoCompleteTextView>(R.id.editTextDivididoEntre)
-        val inputCategoria = view.findViewById<EditText>(R.id.editTextCategoria)
+        val spinnerPagadoPor = view.findViewById<Spinner>(R.id.spinnerPagadoPor)
+        val spinnerCategoria = view.findViewById<Spinner>(R.id.spinnerCategoria)
+        val selectorDivididoEntre = view.findViewById<TextView>(R.id.selectorDivididoEntre)
 
-        // Rellenar datos actuales
         inputNombre.setText(gastoOriginal.nombre)
         inputCantidad.setText(gastoOriginal.cantidad.toString())
-        inputCategoria.setText(gastoOriginal.categoria)
 
-        // Adaptador para usuarios
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listaUsuarios.map { it.nombre })
+        // Spinner de categoría
+        val categorias = listOf("General", "Comida", "Transporte", "Hospedaje", "Ocio")
+        val adapterCategorias = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categorias)
+        adapterCategorias.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCategoria.adapter = adapterCategorias
+        val indexCategoria = categorias.indexOf(gastoOriginal.categoria)
+        if (indexCategoria >= 0) spinnerCategoria.setSelection(indexCategoria)
 
-        inputPagadoPor.setAdapter(adapter)
-        inputPagadoPor.setText(gastoOriginal.pagadoPor?.nombre ?: "")
+        // Spinner de quien pagó
+        val nombresUsuarios = listaUsuarios.map { it.nombre }
+        val adapterUsuarios = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, nombresUsuarios)
+        adapterUsuarios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerPagadoPor.adapter = adapterUsuarios
+        val indexPagadoPor = nombresUsuarios.indexOf(gastoOriginal.pagadoPor?.nombre)
+        if (indexPagadoPor >= 0) spinnerPagadoPor.setSelection(indexPagadoPor)
 
-        inputDivididoEntre.setAdapter(adapter)
-        inputDivididoEntre.setTokenizer(MultiAutoCompleteTextView.CommaTokenizer())
-        inputDivididoEntre.setText(
-            gastoOriginal.divididoEntre.joinToString(", ") { it.nombre }
-        )
+        // Selección múltiple para "dividido entre"
+        val seleccionados = BooleanArray(listaUsuarios.size) { i ->
+            gastoOriginal.divididoEntre.any { it.nombre == listaUsuarios[i].nombre }
+        }
+        val seleccionadosTemp = mutableListOf<Usuario>().apply {
+            addAll(gastoOriginal.divididoEntre)
+        }
 
+        fun actualizarTextoSeleccionados() {
+            val texto = seleccionadosTemp.joinToString(", ") { it.nombre }
+            selectorDivididoEntre.text = if (texto.isNotEmpty()) texto else "Usuarios que comparten"
+        }
+        actualizarTextoSeleccionados()
+
+        selectorDivididoEntre.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Seleccionar usuarios")
+                .setMultiChoiceItems(nombresUsuarios.toTypedArray(), seleccionados) { _, which, isChecked ->
+                    val usuario = listaUsuarios[which]
+                    if (isChecked) {
+                        if (!seleccionadosTemp.contains(usuario)) {
+                            seleccionadosTemp.add(usuario)
+                        }
+                    } else {
+                        seleccionadosTemp.remove(usuario)
+                    }
+                }
+                .setPositiveButton("Aceptar") { _, _ -> actualizarTextoSeleccionados() }
+                .setNegativeButton("Cancelar", null)
+                .show()
+        }
+
+        // Confirmar cambios
         AlertDialog.Builder(requireContext())
             .setTitle("Editar gasto")
             .setView(view)
             .setPositiveButton("Guardar") { _, _ ->
                 val nuevoNombre = inputNombre.text.toString()
                 val nuevaCantidad = inputCantidad.text.toString().toDoubleOrNull()
-                val nuevaCategoria = inputCategoria.text.toString()
+                val nuevaCategoria = spinnerCategoria.selectedItem.toString()
+                val nombrePagadoPor = spinnerPagadoPor.selectedItem.toString()
+                val pagadoPor = listaUsuarios.find { it.nombre == nombrePagadoPor }
 
-                if (nuevoNombre.isNotEmpty() && nuevaCantidad != null) {
-
-                    // Obtener usuario que pagó
-                    val nombrePagadoPor = inputPagadoPor.text.toString()
-                    val pagadoPor = listaUsuarios.find { it.nombre == nombrePagadoPor }
-
-                    // Usuarios que lo comparten
-                    val nombresDivididos = inputDivididoEntre.text.toString().split(",").map { it.trim() }
-                    val divididoEntre = listaUsuarios.filter { nombresDivididos.contains(it.nombre) }
-
-                    // Actualizar gasto
+                if (nuevoNombre.isNotEmpty() && nuevaCantidad != null && pagadoPor != null && seleccionadosTemp.isNotEmpty()) {
                     val gastoActualizado = gastoOriginal.copy(
                         nombre = nuevoNombre,
                         cantidad = nuevaCantidad,
+                        categoria = nuevaCategoria,
                         pagadoPor = pagadoPor,
-                        divididoEntre = divididoEntre,
-                        categoria = nuevaCategoria
+                        divididoEntre = seleccionadosTemp.toList()
                     )
 
-                    // Guardar en Firebase
                     val repo = GastoRepository()
                     repo.actualizarGasto(grupoId, gastoActualizado) { success ->
                         if (success) {
@@ -207,13 +235,18 @@ class GastoDetailFragment : Fragment() {
                         }
                     }
                 } else {
-                    Toast.makeText(requireContext(), "Datos inválidos", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Completa todos los campos", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancelar", null)
             .create()
             .show()
     }
+
+
+
+
+
     private fun cargarUsuariosDelGrupo(grupoId: String, callback: (List<Usuario>) -> Unit) {
         val usuariosRef = FirebaseDatabase.getInstance().getReference("usuarios").child(grupoId)
 

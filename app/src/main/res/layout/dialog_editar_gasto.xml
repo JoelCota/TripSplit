@@ -20,27 +20,26 @@
         android:hint="Cantidad"
         android:inputType="numberDecimal" />
 
-    <EditText
-        android:id="@+id/editTextCategoria"
+    <Spinner
+        android:id="@+id/spinnerPagadoPor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:hint="Categoría"/>
+        android:layout_marginTop="12dp" />
 
-    <AutoCompleteTextView
-        android:id="@+id/editTextPagadoPor"
+    <Spinner
+        android:id="@+id/spinnerCategoria"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:hint="Quién pagó"
-        android:completionHint="Selecciona un usuario" />
+        android:layout_marginTop="12dp" />
 
-    <MultiAutoCompleteTextView
-        android:id="@+id/editTextDivididoEntre"
+    <TextView
+        android:id="@+id/selectorDivididoEntre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:hint="Usuarios que comparten"
-        android:completionHint="Selecciona usuarios"
-        android:imeOptions="actionDone|flagNoExtractUi" />
+        android:padding="12dp"
+        android:background="?android:attr/editTextBackground"
+        android:drawableRight="@android:drawable/arrow_down_float" />
+
 </LinearLayout>
