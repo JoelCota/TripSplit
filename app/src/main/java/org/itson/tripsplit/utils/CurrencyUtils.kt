@@ -23,4 +23,8 @@ class CurrencyUtils {
             ?: throw IllegalArgumentException("Moneda no soportada: $currency")
         return amount * rate
     }
+    fun toUsdWithTwoDecimals(amount: Double, currency: String): Double {
+        val converted = toUsd(amount, currency)
+        return "%.2f".format(converted).toDouble()
+    }
 }

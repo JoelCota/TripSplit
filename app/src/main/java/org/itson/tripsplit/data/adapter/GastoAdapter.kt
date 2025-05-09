@@ -51,7 +51,7 @@ class GastoAdapter(context: Context, private val resource: Int, private val gast
 
         // Mostrar quién pagó
         holder.txtDetalle.text = when {
-            gasto.pagadoPor != null -> "Pagado por ${gasto.pagadoPor?.nombre?.split(" ")[0]}"
+            gasto.pagadoPor != null -> "Pagado por ${gasto.pagadoPor?.nombre?.split(" ")?.get(0)}"
             else -> "Sin información"
         }
 

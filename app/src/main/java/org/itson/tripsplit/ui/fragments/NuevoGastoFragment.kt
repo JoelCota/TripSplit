@@ -43,9 +43,9 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
     private lateinit var spinnerCategoria: Spinner
     private lateinit var spinnerMoneda: Spinner
     val currencyUtils=CurrencyUtils()
-    private var categorySelected : String = "General"
+    private var categorySelected : String = ""
     private lateinit var paidBy : Usuario
-    private var monedaSeleccionada: String = "USD"
+    private var monedaSeleccionada: String = ""
     private lateinit var miembros: List<Usuario>
     private lateinit var divididosEntre: List<Usuario>
     private val monedas = arrayOf("USD", "MXN", "EUR")
@@ -105,7 +105,7 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
             dialog.show(parentFragmentManager, "currencyDialog")
         }
         btnGuardar.setOnClickListener {
-            if(edtNombre.text.isEmpty() || edtCantidad.text.isEmpty()){
+            if(edtNombre.text.isEmpty() || edtCantidad.text.isEmpty() || categorySelected.isEmpty() || divididosEntre.isEmpty()){
                 Toast.makeText(requireContext(), "Todos los campos deben estar llenos.", Toast.LENGTH_SHORT).show()
             } else {
                 val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -113,7 +113,7 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
                 val gasto = Gasto(
                     nombre = edtNombre.text.toString(),
                     categoria = categorySelected,
-                    cantidad = currencyUtils.toUsd(cantidad,monedaSeleccionada),
+                    cantidad = currencyUtils.toUsdWithTwoDecimals(cantidad,monedaSeleccionada),
                     moneda=monedaSeleccionada,
                     fecha = sdf.format(Date()),
                     pagadoPor = paidBy,
