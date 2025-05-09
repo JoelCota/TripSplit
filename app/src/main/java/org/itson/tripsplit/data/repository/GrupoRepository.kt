@@ -111,19 +111,40 @@ class GrupoRepository {
         })
     }
 
+    fun tieneGrupos(userId: String, callback: (Boolean) -> Unit) {
+        val ref = FirebaseDatabase.getInstance().getReference("usuariosPorGrupo").child(userId)
+
+        ref.get().addOnSuccessListener { dataSnapshot ->
+            callback(dataSnapshot.exists() && dataSnapshot.childrenCount > 0)
+        }.addOnFailureListener {
+            callback(false)
+        }
+    }
 
 
 
-    fun eliminarGrupo(grupoId: String, callback: (Boolean) -> Unit) {
-        val updates = hashMapOf<String, Any?>(
-            "/grupos/$grupoId" to null,
-            "/usuariosPorGrupo/$grupoId" to null,
-            "/gastosPorGrupo/$grupoId" to null
-        )
 
-        database.updateChildren(updates)
-            .addOnSuccessListener { callback(true) }
-            .addOnFailureListener { callback(false) }
+    fun eliminarGrupo(grupoId: String, onComplete: (Boolean) -> Unit) {
+        val grupoRef = FirebaseDatabase.getInstance().getReference("grupos").child(grupoId)
+        val gastosRef = FirebaseDatabase.getInstance().getReference("gastosPorGrupo").child(grupoId)
+
+        // Eliminar los gastos primero
+        gastosRef.removeValue()
+            .addOnSuccessListener {
+                // Luego eliminar el grupo
+                grupoRef.removeValue()
+                    .addOnSuccessListener {
+                        onComplete(true)
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e("GrupoRepository", "Error al eliminar grupo: ${exception.message}")
+                        onComplete(false)
+                    }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("GrupoRepository", "Error al eliminar gastos: ${exception.message}")
+                onComplete(false)
+            }
     }
 
     fun unirseAGrupo(grupoId: String, usuarioId: String, callback: (Boolean, String) -> Unit) {

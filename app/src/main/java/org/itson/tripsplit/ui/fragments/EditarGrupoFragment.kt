@@ -15,6 +15,9 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -34,6 +37,7 @@ class EditarGrupoFragment : Fragment() {
     private lateinit var btnEditTitle: ImageButton
     private lateinit var txtCopyLink: TextView
     private lateinit var btnBack: ImageButton
+    private lateinit var btnEliminarGrupo: ImageButton
     private val listaUsers: MutableList<Usuario> = mutableListOf()
     private lateinit var contenedorUsuarios: LinearLayout
     private lateinit var idCreadorDelGrupo: String
@@ -54,6 +58,7 @@ class EditarGrupoFragment : Fragment() {
         txtTripTitle = view.findViewById(R.id.txtTripTitle)
         btnEditTitle = view.findViewById(R.id.btnEditGroup)
         txtCopyLink = view.findViewById(R.id.txtCopyLink)
+        btnEliminarGrupo = view.findViewById(R.id.btnDeleteGroup)
 
 
         // Lógica para editar el título
@@ -72,6 +77,29 @@ class EditarGrupoFragment : Fragment() {
             val grupoId = arguments?.getString("grupoId")
             if (grupoId != null) {
                 mostrarDialogoEditarNombre(grupoId)
+            }
+        }
+        btnEliminarGrupo.setOnClickListener {
+            val grupoId = arguments?.getString("grupoId")
+            if (grupoId != null) {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Eliminar grupo")
+                    .setMessage("¿Estás seguro? Esta acción eliminará todos los gastos del grupo.")
+                    .setPositiveButton("Eliminar") { _, _ ->
+                        val repo = GrupoRepository()
+
+                        repo.eliminarGrupo(grupoId) { success ->
+                            if (success) {
+                                Toast.makeText(requireContext(), "Grupo eliminado", Toast.LENGTH_SHORT).show()
+                                irAGruposFragment()
+                            } else {
+                                Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .create()
+                    .show()
             }
         }
         return view
@@ -100,6 +128,15 @@ class EditarGrupoFragment : Fragment() {
                 txtTripTitle.text = nombreGrupo
             }
         }
+    }
+    private fun irAGruposFragment() {
+        val fragmentManager = requireActivity().supportFragmentManager
+        val transaction = fragmentManager.beginTransaction()
+
+        // Reemplaza el contenido del contenedor por GruposFragment
+        transaction.replace(R.id.fragmentContainer, GruposFragment())
+        transaction.addToBackStack(null) // Opcional: permite volver atrás
+        transaction.commit()
     }
 
     private fun cargarAvatarUsuario(userId: String, imageView: ImageView) {

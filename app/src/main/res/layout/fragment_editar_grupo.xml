@@ -50,6 +50,13 @@
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:textStyle="bold"
                 android:src="@drawable/ic_edit" />
+            <ImageButton
+                android:id="@+id/btnDeleteGroup"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Eliminar miembro"
+                android:src="@android:drawable/ic_menu_delete" />
 
         </LinearLayout>
     </LinearLayout>

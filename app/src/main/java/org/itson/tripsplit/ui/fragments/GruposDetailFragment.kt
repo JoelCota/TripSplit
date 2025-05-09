@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.database.FirebaseDatabase
@@ -183,6 +184,9 @@ class GruposDetailFragment : Fragment() {
         }
         val textViewMesActual = view.findViewById<TextView>(R.id.textMesGasto)
         actualizarMesActual(textViewMesActual)
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+
     }
     private fun actualizarMesActual(textView: TextView) {
         val dateFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
