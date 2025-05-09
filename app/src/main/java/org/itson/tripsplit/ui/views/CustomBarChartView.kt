@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import kotlin.math.log10
+import kotlin.math.pow
 
 class CustomBarChartView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -23,22 +25,26 @@ class CustomBarChartView @JvmOverloads constructor(
     }
 
     private val valuePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.BLACK
+        color = Color.parseColor("#333333")
         textSize = 30f
         textAlign = Paint.Align.CENTER
         typeface = Typeface.DEFAULT_BOLD
     }
 
     private val axisPaint = Paint().apply {
-        color = Color.BLACK
-        strokeWidth = 4f
+        color = Color.LTGRAY
+        strokeWidth = 3f
     }
 
-    private val colors = listOf(
-        Color.BLUE, Color.RED, Color.GREEN, Color.MAGENTA, Color.CYAN, Color.YELLOW
+    private val barColors = listOf(
+        Color.parseColor("#673AB7"),
+        Color.parseColor("#9575CD"),
+        Color.parseColor("#D1C4E9"),
+        Color.parseColor("#B39DDB"),
+        Color.parseColor("#7E57C2"),
+        Color.parseColor("#512DA8")
     )
 
-    // Ahora acepta etiquetas
     fun setData(values: List<Float>, etiquetas: List<String>? = null) {
         data = values
         labels = etiquetas ?: List(values.size) { "Item ${it + 1}" }
@@ -47,34 +53,49 @@ class CustomBarChartView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
         if (data.isEmpty()) return
 
         val width = width.toFloat()
         val height = height.toFloat()
+        val barWidth = width / (data.size * 2.5f)
+        val maxBarHeight = height - 140f
+        val baselineY = height - 60f
 
-        val barWidth = width / (data.size * 2)
-        val maxBarHeight = height - 100f
+        val maxValue = data.maxOrNull() ?: 1f
 
-        canvas.drawLine(0f, height - 60f, width, height - 60f, axisPaint)
+        // Línea base
+        canvas.drawLine(0f, baselineY, width, baselineY, axisPaint)
 
         data.forEachIndexed { index, value ->
-            val left = barWidth + index * barWidth * 2
-            val barHeight = (value / 100f) * maxBarHeight
-            val top = height - 60f - barHeight
+            val scaledHeight = (value / maxValue) * maxBarHeight
+            val left = barWidth + index * barWidth * 2.5f
+            val top = baselineY - scaledHeight
             val right = left + barWidth
-            val bottom = height - 60f
+            val bottom = baselineY
 
-            // Color para cada barra
-            barPaint.color = colors[index % colors.size]
-            canvas.drawRect(left, top, right, bottom, barPaint)
+            // Color de la barra
+            barPaint.color = barColors[index % barColors.size]
 
-            // Valor que se ve encima de cada barra
-            canvas.drawText("${value.toInt()}", left + barWidth / 2, top - 10f, valuePaint)
+            // Dibujar barra
+            val rectF = RectF(left, top, right, bottom)
+            canvas.drawRoundRect(rectF, 20f, 20f, barPaint)
 
-            // Etiqueta debajo de cada barra
+            // Dibujar valor encima (con formateo si es grande)
+            val valueFormatted = formatLargeNumber(value)
+            val valueY = if (top - 20f < 30f) 30f else top - 15f // evitar que suba demasiado
+            canvas.drawText(valueFormatted, left + barWidth / 2, valueY, valuePaint)
+
+            // Etiqueta abajo
             val label = labels.getOrNull(index) ?: "Item ${index + 1}"
             canvas.drawText(label, left + barWidth / 2, height - 20f, labelPaint)
+        }
+    }
+
+    private fun formatLargeNumber(value: Float): String {
+        return when {
+            value >= 1_000_000 -> "%.1fM".format(value / 1_000_000)
+            value >= 1_000 -> "%.1fK".format(value / 1_000)
+            else -> "%.0f".format(value)
         }
     }
 }

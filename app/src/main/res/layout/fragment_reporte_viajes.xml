@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lightGray"
+    android:orientation="vertical"
+    android:paddingTop="25dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+
+    <!-- Encabezado redondo con botón de retroceso -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@drawable/gradient_title"
+        android:orientation="vertical"
+        android:paddingStart="30dp"
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Volver"
+            android:src="@drawable/ic_back" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtTituloViaje"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text=""
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/title_font_size"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Caja de resumen de gastos -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_bg"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/txtTotalGastado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+
+    <!-- Botones de acciones -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_bg"
+        android:padding="20dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="3">
+
+        <Button
+            android:id="@+id/btnGrafica"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Gráfica"
+            android:textSize="13sp"
+            android:backgroundTint="#673AB7"
+            android:textColor="@android:color/white"
+            android:padding="10dp"
+            android:layout_marginEnd="6dp" />
+
+        <Button
+            android:id="@+id/btnListadoGastos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Gastos"
+            android:textSize="13sp"
+            android:backgroundTint="#673AB7"
+            android:textColor="@android:color/white"
+            android:padding="10dp"
+            android:layout_marginEnd="6dp" />
+
+        <Button
+            android:id="@+id/btnSaldos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Saldos"
+            android:textSize="13sp"
+            android:backgroundTint="#673AB7"
+            android:textColor="@android:color/white"
+            android:padding="10dp" />
+    </LinearLayout>
+
+    <!-- Gráfica de gastos -->
+    <org.itson.tripsplit.ui.views.CustomBarChartView
+        android:id="@+id/barChart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        android:background="@drawable/rounded_bg" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_bg"
+        android:padding="20dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <ListView
+            android:id="@+id/listaGastos"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            />
+        <ListView
+            android:id="@+id/listaDeudas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+
+
+</LinearLayout>

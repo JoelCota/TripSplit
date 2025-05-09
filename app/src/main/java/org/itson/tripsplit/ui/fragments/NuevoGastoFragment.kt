@@ -19,6 +19,7 @@ import org.itson.tripsplit.data.model.Usuario
 import org.itson.tripsplit.data.repository.GrupoRepository
 import org.itson.tripsplit.data.repository.UserRepository
 import org.itson.tripsplit.repository.GastoRepository
+import org.itson.tripsplit.utils.CurrencyUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -41,7 +42,7 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
     private val usuarioRepository = UserRepository()
     private lateinit var spinnerCategoria: Spinner
     private lateinit var spinnerMoneda: Spinner
-
+    val currencyUtils=CurrencyUtils()
     private var categorySelected : String = "General"
     private lateinit var paidBy : Usuario
     private var monedaSeleccionada: String = "USD"
@@ -112,7 +113,7 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
                 val gasto = Gasto(
                     nombre = edtNombre.text.toString(),
                     categoria = categorySelected,
-                    cantidad = cantidad,
+                    cantidad = currencyUtils.toUsd(cantidad,monedaSeleccionada),
                     moneda=monedaSeleccionada,
                     fecha = sdf.format(Date()),
                     pagadoPor = paidBy,
@@ -130,7 +131,6 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
                             .commit()
                         println("Gasto agregado con éxito")
                     } else {
-                        // Si algo falló
                         println("Error al agregar el gasto")
                     }
                 }
@@ -160,15 +160,17 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
     }
 
     fun actualizarPagadoPor(nombre: String) {
-        txtPagadoPor.text = "Pagado por $nombre "
+        val primerNombre = nombre.split(" ")[0]
+        txtPagadoPor.text = "Pagado por $primerNombre "
     }
 
     fun actualizarDivididoEntre(miembrosSeleccionados: List<Usuario>) {
         val totalMiembros = 3
         val texto: String = when {
-            miembrosSeleccionados.size == 1 -> "y dividido entre  ${miembrosSeleccionados[0].nombre}"
+            miembrosSeleccionados.size == 1 -> "y dividido entre  ${miembrosSeleccionados[0].nombre.split(" ")[0]}"
             miembrosSeleccionados.size == totalMiembros -> "y dividido entre  Todos"
-            else -> "y dividido entre  ${miembrosSeleccionados[0].nombre} y ${miembrosSeleccionados.size - 1} más"
+            miembrosSeleccionados.size >1 ->" y dividido entre  ${miembrosSeleccionados[0].nombre.split(" ")[0]} y ${miembrosSeleccionados.size - 1} más"
+            else -> {"y dividido entre  ${miembrosSeleccionados[0].nombre.split(" ")[0]}"}
         }
         txtDivididoEntre.text = texto
     }

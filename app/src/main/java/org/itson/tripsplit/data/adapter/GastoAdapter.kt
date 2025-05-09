@@ -10,6 +10,7 @@ import org.itson.tripsplit.R
 import org.itson.tripsplit.data.model.Gasto
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.text.split
 
 class GastoAdapter(context: Context, private val resource: Int, private val gastos: List<Gasto>) :
     ArrayAdapter<Gasto>(context, resource, gastos) {
@@ -50,7 +51,7 @@ class GastoAdapter(context: Context, private val resource: Int, private val gast
 
         // Mostrar quién pagó
         holder.txtDetalle.text = when {
-            gasto.pagadoPor != null -> "Pagado por ${gasto.pagadoPor?.nombre}"
+            gasto.pagadoPor != null -> "Pagado por ${gasto.pagadoPor?.nombre?.split(" ")[0]}"
             else -> "Sin información"
         }
 

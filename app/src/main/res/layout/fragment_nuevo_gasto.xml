@@ -147,12 +147,11 @@
                 android:id="@+id/txtDivididoEntre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="dividido entre todos"
+                android:text=" y dividido entre todos"
                 android:textSize="12sp"
                 android:textColor="@android:color/black"
                 android:clickable="true"
-                android:focusable="true"
-                android:layout_marginStart="30dp"/>
+                android:focusable="true"/>
         </LinearLayout>
 
         <!-- Botón de Guardar -->

@@ -251,4 +251,21 @@ class GrupoRepository {
             callback(false, "Error al leer los usuarios del grupo: ${it.message}")
         }
     }
+
+    fun verificarUnicoMiembro(grupoId: String, callback: (Boolean) -> Unit) {
+        val dbRef = FirebaseDatabase.getInstance().getReference("usuariosPorGrupo").child(grupoId)
+
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val totalMiembros = snapshot.childrenCount.toInt()
+                callback(totalMiembros == 1)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Error al verificar miembros: ${error.message}")
+                callback(false)
+            }
+        })
+    }
+
 }

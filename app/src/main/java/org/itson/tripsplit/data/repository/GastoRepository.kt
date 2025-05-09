@@ -1,14 +1,17 @@
 package org.itson.tripsplit.repository
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.google.firebase.database.*
+import org.itson.tripsplit.data.model.Deuda
 import org.itson.tripsplit.data.model.Gasto
-import org.itson.tripsplit.data.model.Usuario
 import java.util.UUID
 
 class GastoRepository {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
+
     fun agregarGasto(grupoId: String, gasto: Gasto, onComplete: (Boolean) -> Unit) {
         val gastoId = UUID.randomUUID().toString()
         val gastoConId = gasto.copy(id = gastoId)
@@ -20,78 +23,47 @@ class GastoRepository {
             }
     }
 
-    fun obtenerGastos(grupoId: String, callback: (List<Gasto>) -> Unit) {
+    fun obtenerTotalesPorCategoria(grupoId: String, callback: (Map<String, Float>) -> Unit) {
         val gastosRef = database.child("gastosPorGrupo").child(grupoId)
-
         gastosRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            @RequiresApi(Build.VERSION_CODES.N)
             override fun onDataChange(snapshot: DataSnapshot) {
-                val listaGastos = mutableListOf<Gasto>()
-
-                if (!snapshot.exists()) {
-                    Log.d("GastoRepository", "No existen gastos para el grupo $grupoId")
-                    callback(emptyList())
-                    return
-                }
-
+                val totales = mutableMapOf<String, Float>()
                 for (gastoSnap in snapshot.children) {
                     val gasto = gastoSnap.getValue(Gasto::class.java)
                     if (gasto != null) {
-
-                        Log.d("GastoRepository", "Gasto ID: ${gasto.id}")
-                        val pagadoporMap = gastoSnap.child("pagadoPor").value as? Map<String, Any>
-                        val pagadoPor = pagadoporMap?.let { map ->
-                            Usuario(
-                                id = map["id"].toString(),
-                                nombre = map["nombre"].toString(),
-                                email = map["email"].toString(),
-                            )
-                        }
-                        gasto.pagadoPor = pagadoPor
-                        listaGastos.add(gasto)
+                        val categoria = gasto.categoria ?: "Sin categoría"
+                        val cantidad = gasto.cantidad?.toFloat() ?: 0f
+                        totales[categoria] = totales.getOrDefault(categoria, 0f) + cantidad
                     }
                 }
-                Log.d("GastoRepository", "Total gastos cargados: ${listaGastos.size}")
-                callback(listaGastos)
+                callback(totales)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("GastoRepository", "Error al cargar gastos: ${error.message}")
-                callback(emptyList())
+                callback(emptyMap())
             }
         })
     }
 
-    fun obtenerGastosConTotal(grupoId: String, callback: (List<Gasto>, Double) -> Unit) {
-        val gastosRef = database.child("gastosPorGrupo").child(grupoId)
 
-        gastosRef.addValueEventListener(object : ValueEventListener {
+    fun obtenerGastos(grupoId: String, callback: (List<Gasto>) -> Unit) {
+        val gastosRef = database.child("gastosPorGrupo").child(grupoId)
+        gastosRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val listaGastos = mutableListOf<Gasto>()
-                var total = 0.0
-
                 for (gastoSnap in snapshot.children) {
                     val gasto = gastoSnap.getValue(Gasto::class.java)
-                    if (gasto != null) {
-                        val pagadoporMap = gastoSnap.child("pagadoPor").value as? Map<String, Any>
-                        val pagadoPor = pagadoporMap?.let { map ->
-                            Usuario(
-                                id = map["id"].toString(),
-                                nombre = map["nombre"].toString(),
-                                email = map["email"].toString(),
-                            )
-                        }
-                        gasto.pagadoPor = pagadoPor
-                        total += gasto.cantidad
-                        Log.d("GastoRepository", "Total gastos: $total")
-                        listaGastos.add(gasto)
+                    gasto?.let {
+                        listaGastos.add(it)
                     }
                 }
-                callback(listaGastos, total)
+                callback(listaGastos)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("GastoRepository", "Error al cargar gastos: ${error.message}")
-                callback(emptyList(), 0.0)
+                Log.e("FirebaseError", "Error al obtener gastos: ${error.message}")
+                callback(emptyList())
             }
         })
     }
@@ -123,7 +95,6 @@ class GastoRepository {
 
     fun obtenerTotalGastado(grupoId: String, callback: (Double) -> Unit) {
         val gastosRef = database.child("gastosPorGrupo").child(grupoId)
-        println(gastosRef)
         gastosRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 var total = 0.0
@@ -141,5 +112,107 @@ class GastoRepository {
             }
         })
     }
+    fun obtenerBalanceUsuario(grupoId: String, userId: String, callback: (Double) -> Unit) {
+        val gastosRef = database.child("gastosPorGrupo").child(grupoId)
+        gastosRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var totalDeuda = 0.0
+                var totalCredito = 0.0
+
+                for (gastoSnap in snapshot.children) {
+                    val gasto = gastoSnap.getValue(Gasto::class.java)
+                    if (gasto != null) {
+                        val participantes = gasto.divididoEntre.orEmpty()
+                        val cantidadTotal = gasto.cantidad
+
+                        if (participantes.any { it.id == userId }) {
+                            val cantidadPorPersona = cantidadTotal / participantes.size
+                            totalDeuda += cantidadPorPersona
+                        }
+
+                        if (gasto.pagadoPor?.id == userId) {
+                            totalCredito += cantidadTotal
+                        }
+                    }
+                }
+
+                val balance = totalCredito - totalDeuda
+                callback(balance)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Error al calcular balance: ${error.message}")
+                callback(0.0)
+            }
+        })
+    }
+
+
+    fun calcularDeudasPorIdGrupo(grupoId: String, callback: (List<Deuda>) -> Unit) {
+        val dbRef = FirebaseDatabase.getInstance().getReference("gastosPorGrupo").child(grupoId)
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val deudasMap = mutableMapOf<Pair<String, String>, Double>()
+
+                for (gastoSnap in snapshot.children) {
+                    val gasto = gastoSnap.getValue(Gasto::class.java)
+
+                    if (gasto != null) {
+                        val cantidadTotal = gasto.cantidad
+                        val pagador = gasto.pagadoPor
+                        val participantes = gasto.divididoEntre.orEmpty()
+
+                        if (pagador != null && participantes.isNotEmpty()) {
+                            val cantidadPorPersona = cantidadTotal / participantes.size
+
+                            for (usuario in participantes) {
+                                if (usuario.id != pagador.id) {
+                                    val clave = Pair(usuario.id, pagador.id)
+                                    deudasMap[clave] = (deudasMap[clave] ?: 0.0) + cantidadPorPersona
+                                }
+                            }
+                        }
+                    }
+                }
+
+                val deudas = deudasMap.map { (clave, monto) ->
+                    Deuda(deudor = clave.first, acreedor = clave.second, monto = monto)
+                }
+
+                callback(deudas)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Error al leer gastos: ${error.message}")
+            }
+        })
+    }
+
+    fun calcularCreditoUsuario(grupoId: String, idUsuario: String, callback: (Double) -> Unit) {
+        val gastosRef = database.child("gastosPorGrupo").child(grupoId)
+        gastosRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var totalACobrar = 0.0
+                for (gastoSnap in snapshot.children) {
+                    val gasto = gastoSnap.getValue(Gasto::class.java)
+                    val pagadorId = gasto?.pagadoPor?.id
+                    val participantes = gasto?.divididoEntre.orEmpty()
+                    Log.d("GastoCredito Inicio", gastoSnap.toString())
+                    if (gasto != null && participantes.size > 1) {
+                        val cantidadPorPersona = gasto.cantidad / participantes.size
+                        val cantidadACobrar = cantidadPorPersona * participantes.count { it.id != idUsuario }
+                        totalACobrar += cantidadACobrar
+                    }
+                }
+                callback(totalACobrar)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Error al leer gastos: ${error.message}")
+                callback(0.0)
+            }
+        })
+    }
+
 
 }

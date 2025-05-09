@@ -73,6 +73,7 @@
             android:layout_marginBottom="14dp"
             android:hint="Nombre completo"
             android:inputType="text"
+            android:maxLength="50"
             android:paddingStart="16dp"
             android:background="@drawable/edit_text"
             android:padding="10dp" />
@@ -95,6 +96,7 @@
             android:layout_marginBottom="14dp"
             android:hint="correo@direccion.com"
             android:inputType="text"
+            android:maxLength="35"
             android:paddingStart="16dp"
             android:background="@drawable/edit_text"
             android:padding="10dp" />

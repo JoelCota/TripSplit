@@ -1,6 +1,7 @@
 package org.itson.tripsplit.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ class GruposFragment : Fragment() {
     private lateinit var binding: FragmentGruposBinding
     private val userRepository = UserRepository()
     private val gastoRepository = GastoRepository()
+    private val grupoRepository = GrupoRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,7 +55,7 @@ class GruposFragment : Fragment() {
     private fun mostrarGrupos(grupos: List<Grupo>) {
         val linearLayoutGroups = binding.linearLayoutGroups
         linearLayoutGroups.removeAllViews()
-
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         for (grupo in grupos) {
             val groupView = LayoutInflater.from(context).inflate(R.layout.list_item_group, linearLayoutGroups, false)
 
@@ -61,10 +63,16 @@ class GruposFragment : Fragment() {
             val groupDescriptionTextView: TextView = groupView.findViewById(R.id.group_description)
             val gastosTextView: TextView = groupView.findViewById(R.id.gastos)
             groupNameTextView.text = grupo.nombre
-            gastosTextView.text = "Te deben $0.00"
-            gastoRepository.obtenerGastosConTotal(grupo.id) { listaGastos, total ->
+            gastoRepository.obtenerTotalGastado(grupo.id){total->
                 groupDescriptionTextView.text = "Total: $${"%.2f".format(total)}"
             }
+
+
+            gastoRepository.calcularCreditoUsuario(grupo.id,userId){totalCobrar->
+                println(totalCobrar)
+                gastosTextView.text="Te deben $${totalCobrar} "
+            }
+
             groupView.setOnClickListener {
                 val bundle = Bundle().apply {
                     putString("grupoId", grupo.id)
@@ -112,3 +120,4 @@ class GruposFragment : Fragment() {
         popupWindow.showAsDropDown(view, -view.width - 250, -view.height - 90)
     }
 }
+

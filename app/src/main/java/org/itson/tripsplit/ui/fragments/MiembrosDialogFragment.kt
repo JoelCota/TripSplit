@@ -41,51 +41,51 @@ class MiembrosDialogFragment : DialogFragment() {
         miembros = arguments?.getParcelableArrayList(ARG_MIEMBROS) ?: mutableListOf()
         val mode = arguments?.getString(ARG_MODE)
         Log.d("NuenoGastoINFO", miembros.size.toString())
-
         val containerMiembros: LinearLayout = rootView.findViewById(R.id.containerMiembros)
         val btnGuardar: Button = rootView.findViewById(R.id.btnGuardar)
         val btnCerrar: Button = rootView.findViewById(R.id.btnCerrar)
         val txtTitulo: TextView = rootView.findViewById(R.id.txtTitulo)
         val txtMembers: TextView= rootView.findViewById(R.id.txtMembers)
-        if (miembros.size==1){
-            txtMembers.visibility=View.INVISIBLE
-        }
-
         txtTitulo.text = "Miembros"
         txtTitulo.gravity = View.TEXT_ALIGNMENT_CENTER
-
-        if (mode == "single") {
+        println(miembros)
+        if (miembros.size <= 1){
+            txtMembers.visibility=View.VISIBLE
             btnGuardar.visibility = View.GONE
+        }else {
+            if (mode == "single") {
+                btnGuardar.visibility = View.GONE
 
-            miembros.forEach { miembro ->
-                val button = Button(requireContext())
-                button.text = miembro.nombre
-                button.setBackgroundColor(resources.getColor(android.R.color.white, null))
-                button.setOnClickListener {
-                    val result = Bundle().apply {
-                        putParcelable("usuarioSeleccionado", miembro)
+                miembros.forEach { miembro ->
+                    val button = Button(requireContext())
+                    button.text = miembro.nombre
+                    button.setBackgroundColor(resources.getColor(android.R.color.white, null))
+                    button.setOnClickListener {
+                        val result = Bundle().apply {
+                            putParcelable("usuarioSeleccionado", miembro)
+                        }
+                        parentFragmentManager.setFragmentResult("pagadoPor", result)
+                        dismiss()
                     }
-                    parentFragmentManager.setFragmentResult("pagadoPor", result)
-                    dismiss()
+                    containerMiembros.addView(button)
                 }
-                containerMiembros.addView(button)
-            }
 
 
-        } else {
-            btnGuardar.visibility = View.VISIBLE
+            } else {
+                btnGuardar.visibility = View.VISIBLE
 
-            miembros.forEach { usuario ->
-                val checkBox = CheckBox(requireContext())
-                checkBox.text = usuario.nombre
-                checkBox.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
-                        selectedMiembros.add(usuario)
-                    } else {
-                        selectedMiembros.remove(usuario)
+                miembros.forEach { usuario ->
+                    val checkBox = CheckBox(requireContext())
+                    checkBox.text = usuario.nombre
+                    checkBox.setOnCheckedChangeListener { _, isChecked ->
+                        if (isChecked) {
+                            selectedMiembros.add(usuario)
+                        } else {
+                            selectedMiembros.remove(usuario)
+                        }
                     }
+                    containerMiembros.addView(checkBox)
                 }
-                containerMiembros.addView(checkBox)
             }
         }
 

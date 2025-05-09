@@ -10,13 +10,14 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginEnd="16dp">
+        android:layout_marginEnd="15dp">
         <TextView
             android:id="@+id/txtFechaGasto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Feb 26"
-            android:textSize="14sp"
+            android:text=""
+            android:gravity="center"
+            android:textSize="12sp"
             android:textColor="#666"
             android:layout_marginTop="5dp"/>
 
@@ -37,7 +38,7 @@
                 android:id="@+id/txtNombreGasto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nombre del gasto"
+                android:text=""
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -45,10 +46,10 @@
                 android:id="@+id/txtCategoria"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Comida"
+                android:text=""
                 android:textSize="12sp"
                 android:textAlignment="textEnd"
-                android:paddingEnd="20dp"/>
+                android:paddingEnd="5dp"/>
 
         </LinearLayout>
 
@@ -61,7 +62,7 @@
                 android:id="@+id/txtDetalleGasto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pagado por Juan"
+                android:text=""
                 android:textSize="12sp"
                 android:textColor="#444" />
 
@@ -72,11 +73,12 @@
         android:id="@+id/txtCantidadGasto"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:text="$75.00"
+        android:text=""
         android:textSize="12sp"
+        android:gravity="center"
         android:textStyle="bold"
         android:textColor="@color/black"
         android:paddingTop="5dp"
-        android:paddingRight="26dp"/>
+        android:padding="5dp"/>
 
 </LinearLayout>
