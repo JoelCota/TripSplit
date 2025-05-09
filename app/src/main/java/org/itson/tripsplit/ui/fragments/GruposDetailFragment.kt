@@ -24,6 +24,7 @@ class GruposDetailFragment : Fragment() {
     private lateinit var btnBack: ImageButton
     private lateinit var txtTripTitle: TextView
     private val databaseRef = FirebaseDatabase.getInstance().getReference("grupos")
+    private lateinit var groupDescriptionTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +34,7 @@ class GruposDetailFragment : Fragment() {
 
         btnEditTitle = view.findViewById(R.id.btnEditGroup)
         btnBack = view.findViewById(R.id.btnBack)
+        groupDescriptionTextView = view.findViewById(R.id.txtTotalGastadoValor)
 
         val fab: FloatingActionButton = view.findViewById(R.id.fab_add_gasto)
         fab.setOnClickListener {
@@ -77,6 +79,8 @@ class GruposDetailFragment : Fragment() {
         val listGastos = view.findViewById<ListView>(R.id.listGastos)
         val gruposId = arguments?.getString("grupoId") ?: return
 
+        mostrarTotalGastos(gruposId)
+
         Log.d("FragmentGruposDetail", "grupoId: $gruposId")
 
         val gastoRepo = GastoRepository()
@@ -109,6 +113,12 @@ class GruposDetailFragment : Fragment() {
                     txtTripTitle.text = nombreGrupo
                 }
             }
+        }
+    }
+    private fun mostrarTotalGastos(grupoId: String){
+        val gastoRepo = GastoRepository()
+        gastoRepo.obtenerTotalGastado(grupoId) { total ->
+            view?.findViewById<TextView>(R.id.txtTotalGastadoValor)?.text = "$${"%.2f".format(total)}"
         }
     }
 }

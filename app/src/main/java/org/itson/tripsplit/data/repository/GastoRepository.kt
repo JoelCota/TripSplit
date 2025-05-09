@@ -98,10 +98,14 @@ class GastoRepository {
 
 
     fun eliminarGasto(grupoId: String, gastoId: String, onComplete: (Boolean) -> Unit) {
-        val gastoRef = database.child("gastosPorGrupo").child(grupoId).child(gastoId)
+        val gastoRef = FirebaseDatabase.getInstance().getReference("gastosPorGrupo").child(grupoId).child(gastoId)
+
         gastoRef.removeValue()
-            .addOnCompleteListener { task ->
-                onComplete(task.isSuccessful)
+            .addOnSuccessListener {
+                onComplete(true)
+            }
+            .addOnFailureListener {
+                onComplete(false)
             }
     }
 

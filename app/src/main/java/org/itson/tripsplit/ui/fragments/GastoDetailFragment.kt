@@ -1,5 +1,6 @@
 package org.itson.tripsplit.ui.fragments
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,7 +11,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import org.itson.tripsplit.R
+import org.itson.tripsplit.data.adapter.GastoAdapter
 import org.itson.tripsplit.data.model.Gasto
 import org.itson.tripsplit.repository.GastoRepository
 
@@ -21,6 +24,8 @@ class GastoDetailFragment : Fragment() {
     private lateinit var txtPago: TextView
     private lateinit var btnEliminar: ImageButton
     private lateinit var btnEditar: ImageButton
+    private lateinit var gastoAdapter: GastoAdapter
+    private var listaGastos = mutableListOf<Gasto>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,6 +51,12 @@ class GastoDetailFragment : Fragment() {
         btnEliminar = view.findViewById(R.id.btnDeleteGroup)
         btnEditar = view.findViewById(R.id.btnEditGroup)
 
+        btnEliminar.setOnClickListener {
+            if (grupoId.isNotEmpty() && gastoId.isNotEmpty()) {
+                mostrarDialogoConfirmacionEliminarGasto(grupoId, gastoId)
+            }
+
+        }
         val gastoRepo = GastoRepository()
         gastoRepo.obtenerGastos(grupoId) { gastos ->
             val gasto = gastos.find { it.id == gastoId }
@@ -83,5 +94,27 @@ class GastoDetailFragment : Fragment() {
             deudas.add(mensaje)
         }
         return deudas
+    }
+
+    private fun mostrarDialogoConfirmacionEliminarGasto(grupoId: String, gastoId: String) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Eliminar gasto")
+            .setMessage("¿Estás seguro de eliminar este gasto?")
+            .setPositiveButton("Eliminar") { _, _ ->
+                eliminarGastoDeGrupo(grupoId, gastoId)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun eliminarGastoDeGrupo(grupoId: String, gastoId: String) {
+        val ref = FirebaseDatabase.getInstance().getReference("gastosPorGrupo").child(grupoId).child(gastoId)
+
+        ref.removeValue().addOnSuccessListener {
+            Toast.makeText(requireContext(), "Gasto eliminado", Toast.LENGTH_SHORT).show()
+            requireActivity().onBackPressed()
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show()
+        }
     }
 }

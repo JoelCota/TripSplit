@@ -185,66 +185,46 @@ class GrupoRepository {
         usuarioId: String,
         callback: (Boolean, String) -> Unit
     ) {
-        val grupoRef = FirebaseDatabase.getInstance().getReference("grupos").child(grupoId)
-        val usuarioRef = FirebaseDatabase.getInstance().getReference("usuarios").child(usuarioId)
-        val usuariosPorGrupoRef =FirebaseDatabase.getInstance().getReference("usuariosPorGrupo").child(grupoId)
+        val db = FirebaseDatabase.getInstance()
+        val grupoRef = db.getReference("grupos").child(grupoId).child("usuarios")
+        val usuarioRef = db.getReference("usuarios").child(usuarioId).child("grupos")
+        val usuariosPorGrupoRef = db.getReference("usuariosPorGrupo").child(grupoId).child(usuarioId)
 
-        grupoRef.get().addOnSuccessListener { grupoSnapshot ->
-            if (grupoSnapshot.exists()) {
-                val usuariosRef = grupoRef.child("usuarios")
-                usuariosRef.orderByValue().equalTo(usuarioId).get()
-                    .addOnSuccessListener { userSnapshot ->
-                        if (userSnapshot.exists()) {
-                            userSnapshot.children.firstOrNull()?.ref?.removeValue()
-                                ?.addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        val gruposRef = usuarioRef.child("grupos")
-                                        gruposRef.orderByValue().equalTo(grupoId).get()
-                                            .addOnSuccessListener { userGroupsSnapshot ->
-                                                if (userGroupsSnapshot.exists()) {
-                                                    userGroupsSnapshot.children.firstOrNull()?.ref?.removeValue()
-                                                        ?.addOnCompleteListener { task2 ->
-                                                            if (task2.isSuccessful) {
-                                                                usuariosPorGrupoRef.child(usuarioId)
-                                                                    .removeValue()
-                                                                    .addOnCompleteListener { task3 ->
-                                                                        if (task3.isSuccessful) {
-                                                                            callback(
-                                                                                true,
-                                                                                "Usuario $usuarioId eliminado completamente del grupo $grupoId"
-                                                                            )
-                                                                        } else {
-                                                                            callback(
-                                                                                false,
-                                                                                "Error al eliminar usuario de usuariosPorGrupo"
-                                                                            )
-                                                                        }
-                                                                    }
-                                                            } else {
-                                                                callback(
-                                                                    false,
-                                                                    "Error al eliminar el grupo del perfil del usuario"
-                                                                )
-                                                            }
-                                                        }
-                                                } else {
-                                                    callback(
-                                                        false,
-                                                        "El usuario no está en el grupo"
-                                                    )
-                                                }
-                                            }
-                                    } else {
-                                        callback(false, "Error al eliminar usuario del grupo")
+        // Eliminar usuario de la lista de usuarios del grupo
+        grupoRef.orderByValue().equalTo(usuarioId).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                val userNode = snapshot.children.firstOrNull()
+                userNode?.ref?.removeValue()?.addOnCompleteListener { task1 ->
+                    if (task1.isSuccessful) {
+                        // Eliminar grupo de la lista de grupos del usuario
+                        usuarioRef.orderByValue().equalTo(grupoId).get().addOnSuccessListener { userGroupSnapshot ->
+                            val groupNode = userGroupSnapshot.children.firstOrNull()
+                            groupNode?.ref?.removeValue()?.addOnCompleteListener { task2 ->
+                                if (task2.isSuccessful) {
+                                    // Eliminar el nodo en usuariosPorGrupo
+                                    usuariosPorGrupoRef.removeValue().addOnCompleteListener { task3 ->
+                                        if (task3.isSuccessful) {
+                                            callback(true, "Usuario $usuarioId eliminado correctamente del grupo $grupoId.")
+                                        } else {
+                                            callback(false, "Error al eliminar de usuariosPorGrupo: ${task3.exception?.message}")
+                                        }
                                     }
+                                } else {
+                                    callback(false, "Error al eliminar el grupo del perfil del usuario: ${task2.exception?.message}")
                                 }
-                        } else {
-                            callback(false, "El usuario no está en el grupo")
+                            }
+                        }.addOnFailureListener {
+                            callback(false, "Error al leer los grupos del usuario: ${it.message}")
                         }
+                    } else {
+                        callback(false, "Error al eliminar usuario del grupo: ${task1.exception?.message}")
                     }
+                }
             } else {
-                callback(false, "El grupo no existe")
+                callback(false, "El usuario no está registrado en este grupo.")
             }
+        }.addOnFailureListener {
+            callback(false, "Error al leer los usuarios del grupo: ${it.message}")
         }
     }
 }
