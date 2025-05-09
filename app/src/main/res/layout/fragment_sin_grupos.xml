@@ -37,7 +37,6 @@
         <ImageView
             android:layout_width="65dp"
             android:layout_height="65dp"
-            android:src="@drawable/paper_plane"
             android:layout_marginRight="75dp"/>
     </LinearLayout>
 

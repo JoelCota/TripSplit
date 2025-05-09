@@ -1,13 +1,14 @@
 package org.itson.tripsplit.repository
 
+import android.util.Log
 import com.google.firebase.database.*
 import org.itson.tripsplit.data.model.Gasto
+import org.itson.tripsplit.data.model.Usuario
 import java.util.UUID
 
 class GastoRepository {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
-
     fun agregarGasto(grupoId: String, gasto: Gasto, onComplete: (Boolean) -> Unit) {
         val gastoId = UUID.randomUUID().toString()
         val gastoConId = gasto.copy(id = gastoId)
@@ -25,14 +26,44 @@ class GastoRepository {
         gastosRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val listaGastos = mutableListOf<Gasto>()
+
+                if (!snapshot.exists()) {
+                    Log.d("GastoRepository", "No existen gastos para el grupo $grupoId")
+                    callback(emptyList())
+                    return
+                }
+
+                Log.d("GastoRepository", "Nodos encontrados: ${snapshot.childrenCount}")
                 for (gastoSnap in snapshot.children) {
                     val gasto = gastoSnap.getValue(Gasto::class.java)
-                    gasto?.let { listaGastos.add(it) }
+                    if (gasto != null) {
+
+                        Log.d("GastoRepository", "Gasto ID: ${gasto.id}")
+                        val pagadoporMap = gastoSnap.child("pagadoPor").value as? Map<String, Any>
+                        val pagadoPor = pagadoporMap?.let { map ->
+                            Usuario(
+                                id = map["id"].toString(),
+                                nombre = map["nombre"].toString(),
+                                email = map["email"].toString(),
+                            )
+                        }
+                        gasto.pagadoPor = pagadoPor
+                        Log.d("GastoRepository", """
+                        Gasto:
+                          Nombre: ${gasto.nombre}
+                          Cantidad: ${gasto.cantidad}
+                          Fecha: ${gasto.fecha}
+                          Pagado por: ${pagadoPor?.nombre ?: "null"}
+                    """.trimIndent())
+                        listaGastos.add(gasto)
+                    }
                 }
+                Log.d("GastoRepository", "Total gastos cargados: ${listaGastos.size}")
                 callback(listaGastos)
             }
 
             override fun onCancelled(error: DatabaseError) {
+                Log.e("GastoRepository", "Error al cargar gastos: ${error.message}")
                 callback(emptyList())
             }
         })

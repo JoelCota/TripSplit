@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/lightGray"
     android:orientation="vertical"
+    android:id="@+id/fragmentGastoDetail"
     android:paddingTop="25dp">
 
     <LinearLayout
@@ -71,6 +72,7 @@
             android:layout_weight="1"> <!-- Esto permite que el LinearLayout ocupe el resto del espacio disponible -->
 
             <TextView
+                android:id="@+id/txtNombreGasto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gasto Nieve"
@@ -80,6 +82,7 @@
                 android:layout_marginBottom="5dp" /> <!-- Margen inferior para separar del siguiente TextView -->
 
             <TextView
+                android:id="@+id/txtCantidadGasto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="MXN $110.00"
@@ -129,42 +132,47 @@
             android:textAlignment="center"
             android:textStyle="bold" />
 
-
-        <!-- Gasto: Papas -->
-
-        <!-- Te deben en total -->
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Te deben $50.00 en total"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="16sp"
-            android:layout_marginTop="8dp"/>
+            android:orientation="vertical">
 
-        <!-- Detalles de las deudas -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Juan te debe $25.00"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"/>
+            <!-- Te deben en total -->
+            <TextView
+                android:id="@+id/txtDeudas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Te deben $50.00 en total"
+                android:textColor="@android:color/holo_green_dark"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Diego te debe $25.00"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"/>
+            <!-- Detalles de las deudas -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Juan te debe $25.00"
+                android:textColor="@android:color/holo_green_dark"
+                android:textSize="16sp"
+                android:layout_marginTop="4dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Debes $10.00 a Juan"
-            android:textColor="@android:color/holo_red_dark"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Diego te debe $25.00"
+                android:textColor="@android:color/holo_green_dark"
+                android:textSize="16sp"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Debes $10.00 a Juan"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="16sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>
