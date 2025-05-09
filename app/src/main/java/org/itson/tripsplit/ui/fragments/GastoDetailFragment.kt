@@ -150,10 +150,12 @@ class GastoDetailFragment : Fragment() {
         val inputCantidad = view.findViewById<EditText>(R.id.editTextCantidadGasto)
         val inputPagadoPor = view.findViewById<AutoCompleteTextView>(R.id.editTextPagadoPor)
         val inputDivididoEntre = view.findViewById<MultiAutoCompleteTextView>(R.id.editTextDivididoEntre)
+        val inputCategoria = view.findViewById<EditText>(R.id.editTextCategoria)
 
         // Rellenar datos actuales
         inputNombre.setText(gastoOriginal.nombre)
         inputCantidad.setText(gastoOriginal.cantidad.toString())
+        inputCategoria.setText(gastoOriginal.categoria)
 
         // Adaptador para usuarios
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listaUsuarios.map { it.nombre })
@@ -173,6 +175,7 @@ class GastoDetailFragment : Fragment() {
             .setPositiveButton("Guardar") { _, _ ->
                 val nuevoNombre = inputNombre.text.toString()
                 val nuevaCantidad = inputCantidad.text.toString().toDoubleOrNull()
+                val nuevaCategoria = inputCategoria.text.toString()
 
                 if (nuevoNombre.isNotEmpty() && nuevaCantidad != null) {
 
@@ -189,7 +192,8 @@ class GastoDetailFragment : Fragment() {
                         nombre = nuevoNombre,
                         cantidad = nuevaCantidad,
                         pagadoPor = pagadoPor,
-                        divididoEntre = divididoEntre
+                        divididoEntre = divididoEntre,
+                        categoria = nuevaCategoria
                     )
 
                     // Guardar en Firebase

@@ -29,7 +29,8 @@ class GastoAdapter(context: Context, private val resource: Int, private val gast
                 txtNombre = view.findViewById(R.id.txtNombreGasto),
                 txtCantidad = view.findViewById(R.id.txtCantidadGasto),
                 txtFecha = view.findViewById(R.id.txtFechaGasto),
-                txtDetalle = view.findViewById(R.id.txtDetalleGasto)
+                txtDetalle = view.findViewById(R.id.txtDetalleGasto),
+                txtCategoria = view.findViewById(R.id.txtCategoria)
             )
 
             view.tag = holder
@@ -43,8 +44,9 @@ class GastoAdapter(context: Context, private val resource: Int, private val gast
 
         // Rellenar los campos
         holder.txtNombre.text = gasto.nombre
-        holder.txtCantidad.text = "$${gasto.cantidad}"
+        holder.txtCantidad.text = "${gasto.moneda} $${gasto.cantidad}"
         holder.txtFecha.text = formatDate(gasto.fecha)
+        holder.txtCategoria.text = gasto.categoria
 
         // Mostrar quién pagó
         holder.txtDetalle.text = when {
@@ -60,7 +62,8 @@ class GastoAdapter(context: Context, private val resource: Int, private val gast
         val txtNombre: TextView,
         val txtCantidad: TextView,
         val txtFecha: TextView,
-        val txtDetalle: TextView
+        val txtDetalle: TextView,
+        val txtCategoria: TextView
     )
 
     // Función para formatear la fecha si viene en formato "yyyy-MM-dd"
