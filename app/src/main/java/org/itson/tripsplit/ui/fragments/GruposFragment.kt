@@ -14,11 +14,13 @@ import org.itson.tripsplit.data.repository.GrupoRepository
 import org.itson.tripsplit.databinding.FragmentGruposBinding
 import org.itson.tripsplit.data.model.Grupo
 import org.itson.tripsplit.data.repository.UserRepository
+import org.itson.tripsplit.repository.GastoRepository
 
 class GruposFragment : Fragment() {
 
     private lateinit var binding: FragmentGruposBinding
     private val userRepository = UserRepository()
+    private val gastoRepository = GastoRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,12 +61,16 @@ class GruposFragment : Fragment() {
             val groupDescriptionTextView: TextView = groupView.findViewById(R.id.group_description)
             val gastosTextView: TextView = groupView.findViewById(R.id.gastos)
             groupNameTextView.text = grupo.nombre
-            groupDescriptionTextView.text = "Han gastado $0.00"
             gastosTextView.text = "Te deben $0.00"
+            gastoRepository.obtenerGastosConTotal(grupo.id) { listaGastos, total ->
+                groupDescriptionTextView.text = "Total: $${"%.2f".format(total)}"
+            }
             groupView.setOnClickListener {
                 val bundle = Bundle().apply {
                     putString("grupoId", grupo.id)
                 }
+
+
 
                 val detalleFragment = GruposDetailFragment().apply {
                     arguments = bundle

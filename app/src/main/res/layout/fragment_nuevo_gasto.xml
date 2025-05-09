@@ -106,18 +106,23 @@
                 android:id="@+id/txtMoneda"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Moneda: USD"
-                android:textSize="12sp"
-                android:textColor="@android:color/black" />
+                android:text="Moneda: "
+                android:clickable="true"
+                android:focusable="true"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:paddingEnd="20dp"/>
 
             <TextView
                 android:id="@+id/txtCategoria"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Categoría: General"
-                android:textSize="12sp"
+                android:text="Categoría: "
+                android:textSize="16sp"
+                android:clickable="true"
+                android:focusable="true"
                 android:textColor="@android:color/black"
-                android:layout_marginStart="20dp" />
+                android:layout_marginStart="35dp"/>
         </LinearLayout>
 
         <!-- Pagado por y Dividido entre -->
@@ -142,11 +147,12 @@
                 android:id="@+id/txtDivididoEntre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="y dividido entre todos"
+                android:text="dividido entre todos"
                 android:textSize="12sp"
                 android:textColor="@android:color/black"
                 android:clickable="true"
-                android:focusable="true"/>
+                android:focusable="true"
+                android:layout_marginStart="30dp"/>
         </LinearLayout>
 
         <!-- Botón de Guardar -->

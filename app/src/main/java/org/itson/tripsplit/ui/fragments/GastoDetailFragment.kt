@@ -16,7 +16,6 @@ import org.itson.tripsplit.repository.GastoRepository
 
 class GastoDetailFragment : Fragment() {
 
-    private var gastoId: String? = null
     private lateinit var txtTitulo: TextView
     private lateinit var txtCantidad: TextView
     private lateinit var txtPago: TextView
@@ -56,8 +55,6 @@ class GastoDetailFragment : Fragment() {
                 Toast.makeText(requireContext(), "Gasto no encontrado", Toast.LENGTH_SHORT).show()
             }
         }
-
-
     }
     
     private fun mostrarGastos(gastos: Gasto) {

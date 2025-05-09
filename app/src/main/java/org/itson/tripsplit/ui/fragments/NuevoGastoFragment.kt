@@ -39,6 +39,8 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
     private val grupoRepository = GrupoRepository()
     private val gastoRepository = GastoRepository()
     private val usuarioRepository = UserRepository()
+    private lateinit var spinnerCategoria: Spinner
+    private lateinit var spinnerMoneda: Spinner
 
     private var categorySelected : String = "General"
     private lateinit var paidBy : Usuario
@@ -47,6 +49,7 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
     private lateinit var divididosEntre: List<Usuario>
     private val monedas = arrayOf("USD", "MXN", "EUR")
     private val categorias = arrayOf("General","Comida", "Transporte", "Hospedaje", "Entretenimiento")
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -95,7 +98,7 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
             dialogMultiple.show(parentFragmentManager, "MiembrosDialogFragment")
         }
 
-        btnSetCurrency.setOnClickListener {
+        txtMoneda.setOnClickListener {
             val dialog =
                 ListaSeleccionDialogFragment.newInstance(monedas, "Seleccionar Moneda",this)
             dialog.show(parentFragmentManager, "currencyDialog")
@@ -135,7 +138,7 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
         }
 
         // Click en "Seleccionar Categoría"
-        btnCategories.setOnClickListener {
+        txtCategoria.setOnClickListener {
             val dialog =
                 ListaSeleccionDialogFragment.newInstance(categorias, "Seleccionar Categoría", this)
             dialog.show(parentFragmentManager, "categoryDialog")
@@ -153,9 +156,6 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
             divididosEntre = divididosEntre.filter { miembro -> miembro.id in miembrosSeleccionados }
             actualizarDivididoEntre(divididosEntre)
         }
-
-
-
         return rootView
     }
 

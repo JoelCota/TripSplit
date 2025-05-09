@@ -33,7 +33,6 @@ class GastoRepository {
                     return
                 }
 
-                Log.d("GastoRepository", "Nodos encontrados: ${snapshot.childrenCount}")
                 for (gastoSnap in snapshot.children) {
                     val gasto = gastoSnap.getValue(Gasto::class.java)
                     if (gasto != null) {
@@ -48,13 +47,6 @@ class GastoRepository {
                             )
                         }
                         gasto.pagadoPor = pagadoPor
-                        Log.d("GastoRepository", """
-                        Gasto:
-                          Nombre: ${gasto.nombre}
-                          Cantidad: ${gasto.cantidad}
-                          Fecha: ${gasto.fecha}
-                          Pagado por: ${pagadoPor?.nombre ?: "null"}
-                    """.trimIndent())
                         listaGastos.add(gasto)
                     }
                 }
@@ -68,6 +60,42 @@ class GastoRepository {
             }
         })
     }
+
+    fun obtenerGastosConTotal(grupoId: String, callback: (List<Gasto>, Double) -> Unit) {
+        val gastosRef = database.child("gastosPorGrupo").child(grupoId)
+
+        gastosRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val listaGastos = mutableListOf<Gasto>()
+                var total = 0.0
+
+                for (gastoSnap in snapshot.children) {
+                    val gasto = gastoSnap.getValue(Gasto::class.java)
+                    if (gasto != null) {
+                        val pagadoporMap = gastoSnap.child("pagadoPor").value as? Map<String, Any>
+                        val pagadoPor = pagadoporMap?.let { map ->
+                            Usuario(
+                                id = map["id"].toString(),
+                                nombre = map["nombre"].toString(),
+                                email = map["email"].toString(),
+                            )
+                        }
+                        gasto.pagadoPor = pagadoPor
+                        total += gasto.cantidad
+                        Log.d("GastoRepository", "Total gastos: $total")
+                        listaGastos.add(gasto)
+                    }
+                }
+                callback(listaGastos, total)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("GastoRepository", "Error al cargar gastos: ${error.message}")
+                callback(emptyList(), 0.0)
+            }
+        })
+    }
+
 
     fun eliminarGasto(grupoId: String, gastoId: String, onComplete: (Boolean) -> Unit) {
         val gastoRef = database.child("gastosPorGrupo").child(grupoId).child(gastoId)
