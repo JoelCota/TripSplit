@@ -180,6 +180,18 @@ class GrupoRepository {
         })
     }
 
+    fun actualizarNombreGrupo(grupoId: String, nuevoNombre: String, onComplete: (Boolean) -> Unit) {
+        val grupoRef = FirebaseDatabase.getInstance().getReference("grupos").child(grupoId)
+
+        grupoRef.child("nombre").setValue(nuevoNombre)
+            .addOnSuccessListener {
+                onComplete(true)
+            }
+            .addOnFailureListener {
+                onComplete(false)
+            }
+    }
+
     fun actualizarGasto(grupoId: String, gasto: Gasto, onComplete: (Boolean) -> Unit) {
         val gastoRef = FirebaseDatabase.getInstance().getReference("gastosPorGrupo").child(grupoId).child(gasto.id)
 

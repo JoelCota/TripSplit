@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import org.itson.tripsplit.R
+import org.itson.tripsplit.data.model.Grupo
 import org.itson.tripsplit.data.model.Usuario
 import org.itson.tripsplit.data.repository.*
 
@@ -66,6 +67,12 @@ class EditarGrupoFragment : Fragment() {
         // Lógica para copiar el enlace
         txtCopyLink.setOnClickListener {
             copyLinkToClipboard("http://example.com") // Cambia con el enlace real
+        }
+        btnEditTitle.setOnClickListener {
+            val grupoId = arguments?.getString("grupoId")
+            if (grupoId != null) {
+                mostrarDialogoEditarNombre(grupoId)
+            }
         }
         return view
     }
@@ -144,6 +151,7 @@ class EditarGrupoFragment : Fragment() {
                         mostrarDialogoConfirmacion(usuario.id, grupoId, vistaMiembro)
                     }
 
+                    // Cargar la imagen del avatar
                     cargarAvatarUsuario(usuario.id, imgAvatarUser)
 
                     layoutContenedor?.addView(vistaMiembro)
@@ -173,11 +181,41 @@ class EditarGrupoFragment : Fragment() {
             Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show()
         }
     }
+    private fun mostrarDialogoEditarNombre(grupoId: String) {
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_editar_nombre_grupo, null)
 
-//    private fun eliminarIntegranteVisual(usuario: Usuario) {
-//        listaUsers.remove(usuario)
-//        adapter.updateData(listaUsers)
-//    }
+        val inputNombre = view.findViewById<EditText>(R.id.editTextNuevoNombre)
+
+        // Cargar nombre actual
+        val repo = GrupoRepository()
+        repo.getNombreGrupo(grupoId) { nombre ->
+            if (nombre != null) {
+                inputNombre.setText(nombre)
+            }
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Editar nombre")
+            .setView(view)
+            .setPositiveButton("Guardar") { _, _ ->
+                val nuevoNombre = inputNombre.text.toString()
+                if (nuevoNombre.isNotEmpty()) {
+                    repo.actualizarNombreGrupo(grupoId, nuevoNombre) { success ->
+                        if (success) {
+                            Toast.makeText(requireContext(), "Nombre actualizado", Toast.LENGTH_SHORT).show()
+                            requireActivity().onBackPressed()
+                        } else {
+                            Toast.makeText(requireContext(), "Error al guardar", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "El nombre no puede estar vacío", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .create()
+            .show()
+    }
 
 
     private fun showEditTitleDialog() {

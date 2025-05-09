@@ -6,16 +6,23 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.MultiAutoCompleteTextView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import org.itson.tripsplit.R
 import org.itson.tripsplit.data.adapter.GastoAdapter
 import org.itson.tripsplit.data.model.Gasto
+import org.itson.tripsplit.data.model.Usuario
 import org.itson.tripsplit.repository.GastoRepository
 
 class GastoDetailFragment : Fragment() {
@@ -65,7 +72,9 @@ class GastoDetailFragment : Fragment() {
                 gastoRepo.obtenerGastos(grupoId) { gastos ->
                     val gasto = gastos.find { it.id == gastoId }
                     if (gasto != null) {
-                        mostrarDialogoEditarGasto(grupoId, gasto)
+                        cargarUsuariosDelGrupo(grupoId) { listaUsuarios ->
+                            mostrarDialogoEditarGasto(grupoId, gasto, listaUsuarios)
+                        }
                     } else {
                         Toast.makeText(requireContext(), "Gasto no encontrado", Toast.LENGTH_SHORT).show()
                         }
@@ -134,14 +143,29 @@ class GastoDetailFragment : Fragment() {
         }
     }
 
-    private fun mostrarDialogoEditarGasto(grupoId: String, gasto: Gasto) {
+    private fun mostrarDialogoEditarGasto(grupoId: String, gastoOriginal: Gasto, listaUsuarios: List<Usuario>) {
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_editar_gasto, null)
 
         val inputNombre = view.findViewById<EditText>(R.id.editTextNombreGasto)
         val inputCantidad = view.findViewById<EditText>(R.id.editTextCantidadGasto)
+        val inputPagadoPor = view.findViewById<AutoCompleteTextView>(R.id.editTextPagadoPor)
+        val inputDivididoEntre = view.findViewById<MultiAutoCompleteTextView>(R.id.editTextDivididoEntre)
 
-        inputNombre.setText(gasto.nombre)
-        inputCantidad.setText(gasto.cantidad.toString())
+        // Rellenar datos actuales
+        inputNombre.setText(gastoOriginal.nombre)
+        inputCantidad.setText(gastoOriginal.cantidad.toString())
+
+        // Adaptador para usuarios
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listaUsuarios.map { it.nombre })
+
+        inputPagadoPor.setAdapter(adapter)
+        inputPagadoPor.setText(gastoOriginal.pagadoPor?.nombre ?: "")
+
+        inputDivididoEntre.setAdapter(adapter)
+        inputDivididoEntre.setTokenizer(MultiAutoCompleteTextView.CommaTokenizer())
+        inputDivididoEntre.setText(
+            gastoOriginal.divididoEntre.joinToString(", ") { it.nombre }
+        )
 
         AlertDialog.Builder(requireContext())
             .setTitle("Editar gasto")
@@ -151,15 +175,29 @@ class GastoDetailFragment : Fragment() {
                 val nuevaCantidad = inputCantidad.text.toString().toDoubleOrNull()
 
                 if (nuevoNombre.isNotEmpty() && nuevaCantidad != null) {
-                    // Actualizar los datos del gasto
-                    val gastoActualizado = gasto.copy(nombre = nuevoNombre, cantidad = nuevaCantidad)
 
-                    // Llamar al repositorio para actualizar en Firebase
+                    // Obtener usuario que pagó
+                    val nombrePagadoPor = inputPagadoPor.text.toString()
+                    val pagadoPor = listaUsuarios.find { it.nombre == nombrePagadoPor }
+
+                    // Usuarios que lo comparten
+                    val nombresDivididos = inputDivididoEntre.text.toString().split(",").map { it.trim() }
+                    val divididoEntre = listaUsuarios.filter { nombresDivididos.contains(it.nombre) }
+
+                    // Actualizar gasto
+                    val gastoActualizado = gastoOriginal.copy(
+                        nombre = nuevoNombre,
+                        cantidad = nuevaCantidad,
+                        pagadoPor = pagadoPor,
+                        divididoEntre = divididoEntre
+                    )
+
+                    // Guardar en Firebase
                     val repo = GastoRepository()
                     repo.actualizarGasto(grupoId, gastoActualizado) { success ->
                         if (success) {
                             Toast.makeText(requireContext(), "Gasto actualizado", Toast.LENGTH_SHORT).show()
-                            requireActivity().onBackPressed() // Volver al detalle
+                            requireActivity().onBackPressed()
                         } else {
                             Toast.makeText(requireContext(), "Error al guardar", Toast.LENGTH_SHORT).show()
                         }
@@ -171,5 +209,23 @@ class GastoDetailFragment : Fragment() {
             .setNegativeButton("Cancelar", null)
             .create()
             .show()
+    }
+    private fun cargarUsuariosDelGrupo(grupoId: String, callback: (List<Usuario>) -> Unit) {
+        val usuariosRef = FirebaseDatabase.getInstance().getReference("usuarios").child(grupoId)
+
+        usuariosRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val listaUsuarios = mutableListOf<Usuario>()
+                for (userSnapshot in snapshot.children) {
+                    val usuario = userSnapshot.getValue(Usuario::class.java)
+                    usuario?.let { listaUsuarios.add(it) }
+                }
+                callback(listaUsuarios)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(emptyList())
+            }
+        })
     }
 }
