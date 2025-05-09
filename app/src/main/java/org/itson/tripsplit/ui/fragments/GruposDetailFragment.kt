@@ -106,7 +106,6 @@ class GruposDetailFragment : Fragment() {
             val adapter = GastoAdapter(requireContext(), R.layout.item_gasto, listaGastos)
             listGastos.adapter = adapter
         }
-
         txtTripTitle = view.findViewById(R.id.txtTripTitle)
         val grupoId = arguments?.getString("grupoId")
         if (grupoId != null) {
@@ -117,7 +116,6 @@ class GruposDetailFragment : Fragment() {
                 }
             }
         }
-
         val textViewMesActual = view.findViewById<TextView>(R.id.textMesGasto)
         actualizarMesActual(textViewMesActual)
     }

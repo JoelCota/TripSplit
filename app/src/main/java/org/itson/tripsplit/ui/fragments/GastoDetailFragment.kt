@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -48,6 +49,8 @@ class GastoDetailFragment : Fragment() {
         val grupoId = arguments?.getString("grupoId") ?: return
         val gastoId = arguments?.getString("gastoId") ?: return
 
+        val gastoRepo = GastoRepository()
+
         btnEliminar = view.findViewById(R.id.btnDeleteGroup)
         btnEditar = view.findViewById(R.id.btnEditGroup)
 
@@ -55,9 +58,22 @@ class GastoDetailFragment : Fragment() {
             if (grupoId.isNotEmpty() && gastoId.isNotEmpty()) {
                 mostrarDialogoConfirmacionEliminarGasto(grupoId, gastoId)
             }
-
         }
-        val gastoRepo = GastoRepository()
+
+        btnEditar.setOnClickListener {
+            if (grupoId.isNotEmpty() && gastoId.isNotEmpty()) {
+                gastoRepo.obtenerGastos(grupoId) { gastos ->
+                    val gasto = gastos.find { it.id == gastoId }
+                    if (gasto != null) {
+                        mostrarDialogoEditarGasto(grupoId, gasto)
+                    } else {
+                        Toast.makeText(requireContext(), "Gasto no encontrado", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+            }
+        }
+
+
         gastoRepo.obtenerGastos(grupoId) { gastos ->
             val gasto = gastos.find { it.id == gastoId }
             if (gasto != null) {
@@ -116,5 +132,44 @@ class GastoDetailFragment : Fragment() {
         }.addOnFailureListener {
             Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun mostrarDialogoEditarGasto(grupoId: String, gasto: Gasto) {
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_editar_gasto, null)
+
+        val inputNombre = view.findViewById<EditText>(R.id.editTextNombreGasto)
+        val inputCantidad = view.findViewById<EditText>(R.id.editTextCantidadGasto)
+
+        inputNombre.setText(gasto.nombre)
+        inputCantidad.setText(gasto.cantidad.toString())
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Editar gasto")
+            .setView(view)
+            .setPositiveButton("Guardar") { _, _ ->
+                val nuevoNombre = inputNombre.text.toString()
+                val nuevaCantidad = inputCantidad.text.toString().toDoubleOrNull()
+
+                if (nuevoNombre.isNotEmpty() && nuevaCantidad != null) {
+                    // Actualizar los datos del gasto
+                    val gastoActualizado = gasto.copy(nombre = nuevoNombre, cantidad = nuevaCantidad)
+
+                    // Llamar al repositorio para actualizar en Firebase
+                    val repo = GastoRepository()
+                    repo.actualizarGasto(grupoId, gastoActualizado) { success ->
+                        if (success) {
+                            Toast.makeText(requireContext(), "Gasto actualizado", Toast.LENGTH_SHORT).show()
+                            requireActivity().onBackPressed() // Volver al detalle
+                        } else {
+                            Toast.makeText(requireContext(), "Error al guardar", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Datos inválidos", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .create()
+            .show()
     }
 }
