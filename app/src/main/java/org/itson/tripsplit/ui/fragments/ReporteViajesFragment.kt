@@ -54,7 +54,7 @@ class ReporteViajesFragment : Fragment(R.layout.fragment_reporte_viajes) {
         val txtTripTitle: TextView= binding.root.findViewById(R.id.txtTituloViaje)
         gastosRepository.obtenerTotalGastado(grupoId) { total ->
             val total = total
-            totalGastado.text = "Han gastado ${total}"
+            totalGastado.text = "Han gastado USD$${"%.2f".format(total)}"
         }
         gruposRepository.getNombreGrupo(grupoId,{nombreGrupo ->
             if(nombreGrupo != null){
