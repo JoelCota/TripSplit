@@ -8,23 +8,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.MultiAutoCompleteTextView
+import android.widget.ListView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import org.itson.tripsplit.R
-import org.itson.tripsplit.data.adapter.GastoAdapter
+import org.itson.tripsplit.data.adapter.DeudaAdapter
 import org.itson.tripsplit.data.model.Gasto
 import org.itson.tripsplit.data.model.Usuario
+import org.itson.tripsplit.data.repository.UserRepository
 import org.itson.tripsplit.repository.GastoRepository
 
 class GastoDetailFragment : Fragment() {
@@ -34,8 +33,9 @@ class GastoDetailFragment : Fragment() {
     private lateinit var txtPago: TextView
     private lateinit var btnEliminar: ImageButton
     private lateinit var btnEditar: ImageButton
-    private lateinit var gastoAdapter: GastoAdapter
-    private var listaGastos = mutableListOf<Gasto>()
+    private lateinit var listaResumenDeudas: ListView
+    private val userRepository=UserRepository()
+    val usuarioActual = FirebaseAuth.getInstance().currentUser?.uid
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,11 +55,10 @@ class GastoDetailFragment : Fragment() {
          txtTitulo = view.findViewById(R.id.txtNombreGasto)
          txtCantidad = view.findViewById(R.id.txtCantidadGasto)
          txtPago = view.findViewById(R.id.txtPago)
+        listaResumenDeudas=view.findViewById(R.id.listaMiembrosGasto)
         val grupoId = arguments?.getString("grupoId") ?: return
         val gastoId = arguments?.getString("gastoId") ?: return
-
         val gastoRepo = GastoRepository()
-
         btnEliminar = view.findViewById(R.id.btnDeleteGroup)
         btnEditar = view.findViewById(R.id.btnEditGroup)
 
@@ -84,6 +83,18 @@ class GastoDetailFragment : Fragment() {
             }
         }
 
+        gastoRepo.calcularDeudasPorIdGasto(grupoId, gastoId) {deudasList ->
+            if (deudasList.isEmpty()) {
+                Log.d("GastoDetailFragment", "No hay deudas disponibles")
+            } else {
+                // Obtener los IDs únicos de deudores y acreedores
+                val idsUnicos = deudasList.flatMap { listOf(it.deudor, it.acreedor) }.toSet().toList()
+                userRepository.obtenerNombresUsuarios(idsUnicos) { mapaNombres: Map<String, String> ->
+                    val adapter = DeudaAdapter(requireContext(), deudasList, usuarioActual.toString(), mapaNombres)
+                    listaResumenDeudas.adapter = adapter
+                }
+            }
+        }
 
         gastoRepo.obtenerGastos(grupoId) { gastos ->
             val gasto = gastos.find { it.id == gastoId }
@@ -93,34 +104,19 @@ class GastoDetailFragment : Fragment() {
                 Toast.makeText(requireContext(), "Gasto no encontrado", Toast.LENGTH_SHORT).show()
             }
         }
+
     }
-    
+
     private fun mostrarGastos(gastos: Gasto) {
         txtTitulo.text = gastos.nombre
         txtCantidad.text = "${gastos.moneda} $${gastos.cantidad}"
         val nombrePagador = gastos.pagadoPor?.nombre ?: "Desconocido"
-        txtPago.text = "$nombrePagador pagó ${gastos.moneda} $${gastos.cantidad}"
+        txtPago.text = "${nombrePagador.split(" ").get(0)} pagó ${gastos.moneda} $${gastos.cantidad}"
 
-        val usuarioActual = FirebaseAuth.getInstance().currentUser?.uid
         val esPagador = usuarioActual == gastos.pagadoPor?.id
-        btnEditar.visibility = if (esPagador) View.VISIBLE else View.GONE
-        btnEliminar.visibility = if (esPagador) View.VISIBLE else View.GONE
-    }
+        btnEditar.visibility = if (esPagador) View.VISIBLE else View.INVISIBLE
+        btnEliminar.visibility = if (esPagador) View.VISIBLE else View.INVISIBLE
 
-    private fun calcularDeudas(gasto: Gasto): List<String> {
-        val deudas = mutableListOf<String>()
-        // Ejemplo: Supongamos que divididoEntre contiene los usuarios que deben pagar
-        for (usuario in gasto.divididoEntre) {
-            val montoAPagar = gasto.cantidad / gasto.divididoEntre.size
-            val debe = usuario.id == FirebaseAuth.getInstance().currentUser?.uid
-            val mensaje = if (debe) {
-                "Debes $montoAPagar a ${usuario.nombre}"
-            } else {
-                "${usuario.nombre} te debe $montoAPagar"
-            }
-            deudas.add(mensaje)
-        }
-        return deudas
     }
 
     private fun mostrarDialogoConfirmacionEliminarGasto(grupoId: String, gastoId: String) {
@@ -235,7 +231,7 @@ class GastoDetailFragment : Fragment() {
                         }
                     }
                 } else {
-                    Toast.makeText(requireContext(), "Completa todos los campos", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Datos inválidos", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancelar", null)

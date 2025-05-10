@@ -129,7 +129,7 @@ class CuentaFragment : Fragment() {
         if (userId != null) {
             userRepository.getUser(userId) { user ->
                 if (user != null) {
-                    txtNombre.text  = "Hola, ${user.nombre}"
+                    txtNombre.text  = "Hola, ${user.nombre.split(" ")[0]}"
                 } else {
                     txtNombre.text = "Usuario no encontrado"
                 }

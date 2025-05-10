@@ -86,6 +86,31 @@ class UserRepository {
             }
         }
     }
+    fun obtenerNombresUsuarios(userIds: List<String>, callback: (Map<String, String>) -> Unit) {
+        val nombresMap = mutableMapOf<String, String>()
+        val pendientes = userIds.toMutableSet()
+
+        for (id in userIds) {
+            FirebaseDatabase.getInstance().getReference("usuarios").child(id)
+                .get()
+                .addOnSuccessListener {
+                    val nombre = it.child("nombre").getValue(String::class.java) ?: "Desconocido"
+                    nombresMap[id] = nombre.split(" ")[0]
+                    pendientes.remove(id)
+
+                    if (pendientes.isEmpty()) {
+                        callback(nombresMap)
+                    }
+                }
+                .addOnFailureListener {
+                    nombresMap[id] = "Desconocido"
+                    pendientes.remove(id)
+                    if (pendientes.isEmpty()) {
+                        callback(nombresMap)
+                    }
+                }
+        }
+    }
 
     fun cerrarSesion() {
         FirebaseAuth.getInstance().signOut()

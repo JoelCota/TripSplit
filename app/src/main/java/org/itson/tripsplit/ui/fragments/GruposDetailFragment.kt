@@ -22,6 +22,7 @@ import java.util.Date
 import java.util.Locale
 import com.google.firebase.auth.FirebaseAuth
 import org.itson.tripsplit.data.adapter.DeudaAdapter
+import org.itson.tripsplit.data.repository.UserRepository
 
 class GruposDetailFragment : Fragment() {
     val currentUid = FirebaseAuth.getInstance().currentUser?.uid
@@ -31,8 +32,10 @@ class GruposDetailFragment : Fragment() {
     private lateinit var txtTripTitle: TextView
     private lateinit var btnReporteGastos: TextView
     private val grupoRepository = GrupoRepository()
+    private val userRepository=UserRepository()
+    private val gastosRepository=GastoRepository()
     private lateinit var listaGastos:List<Gasto>
-    private lateinit var groupDescriptionTextView: TextView
+    private lateinit var txtTotalGastado: TextView
     private lateinit var txtTotalBalanceValor: TextView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,8 +47,7 @@ class GruposDetailFragment : Fragment() {
         btnReporteGastos= view.findViewById(R.id.btnReporteGastos)
         btnBack = view.findViewById(R.id.btnBack)
         val grupoId = arguments?.getString("grupoId") ?: ""
-        Log.d("GruposDetail",grupoId)
-        groupDescriptionTextView = view.findViewById(R.id.txtTotalGastadoValor)
+        txtTotalGastado= view.findViewById(R.id.txtTotalGastadoValor)
         val fab: FloatingActionButton = view.findViewById(R.id.fab_add_gasto)
         btnReporteGastos.setOnClickListener{
             val fragment = ReporteViajesFragment()
@@ -61,7 +63,6 @@ class GruposDetailFragment : Fragment() {
                 .commit()
         }
         fab.setOnClickListener {
-            // Navegar a NuevoGastoFragment
             val bundle = Bundle()
             bundle.putString("grupoId", arguments?.getString("grupoId"))
             val nuevoGastoFragment = NuevoGastoFragment()
@@ -72,8 +73,6 @@ class GruposDetailFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
-
-
 
 
         grupoRepository.obtenerGastosPorGrupo(grupoId) { listaGastos ->
@@ -123,34 +122,27 @@ class GruposDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val listGastos = view.findViewById<ListView>(R.id.listGastos)
         val gruposId = arguments?.getString("grupoId") ?: return
         txtTotalBalanceValor=view.findViewById(R.id.txtTotalBalanceValor)
-
         mostrarTotalGastos(gruposId)
         val listView = view.findViewById<ListView>(R.id.listaDeudas)
-
-
-
-        val gastoRepo = GastoRepository()
-
-        gastoRepo.calcularDeudasPorIdGrupo(gruposId) { deudas ->
-
-            val adapter = DeudaAdapter(requireContext(), deudas) { userId, callback ->
-                FirebaseDatabase.getInstance().getReference("usuarios").child(userId)
-                    .get()
-                    .addOnSuccessListener {
-                        val nombre = it.child("nombre").getValue(String::class.java) ?: "Desconocido"
-                        callback(nombre.split(" ")[0])
-                    }
+        gastosRepository.calcularDeudasPorIdGrupo(gruposId) { deudas ->
+            if (deudas.isEmpty()) {
+                Log.d("GruposDetailFragment", "No hay deudas disponibles")
+            } else {
+                val idsUnicos = deudas.flatMap { listOf(it.deudor, it.acreedor) }.toSet().toList()
+                userRepository.obtenerNombresUsuarios(idsUnicos) { mapaNombres: Map<String, String> ->
+                    val adapter = DeudaAdapter(requireContext(), deudas, currentUid.toString(), mapaNombres)
+                    listView.adapter = adapter
+                }
             }
-
-            listView.adapter = adapter
         }
+
+
         if (currentUid!=null){
-            gastoRepo.obtenerBalanceUsuario(gruposId,currentUid){balance ->
-                txtTotalBalanceValor.text="$${balance}"
+            gastosRepository.obtenerBalanceUsuario(gruposId,currentUid){balance ->
+                txtTotalBalanceValor.text="USD$${"%.2f".format(balance)}"
             }
         }
         listGastos.setOnItemClickListener { _, _, position, _ ->
@@ -167,7 +159,7 @@ class GruposDetailFragment : Fragment() {
                     .commit()
             }
         }
-        gastoRepo.obtenerGastos(gruposId) { listaGastos ->
+        gastosRepository.obtenerGastos(gruposId) { listaGastos ->
             val adapter = GastoAdapter(requireContext(), R.layout.item_gasto, listaGastos)
             listGastos.adapter = adapter
         }
@@ -196,7 +188,7 @@ class GruposDetailFragment : Fragment() {
     private fun mostrarTotalGastos(grupoId: String){
         val gastoRepo = GastoRepository()
         gastoRepo.obtenerTotalGastado(grupoId) { total ->
-            view?.findViewById<TextView>(R.id.txtTotalGastadoValor)?.text = "$${"%.2f".format(total)}"
+            view?.findViewById<TextView>(R.id.txtTotalGastadoValor)?.text = "USD$${"%.2f".format(total)}"
         }
     }
 }

@@ -5,17 +5,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isEmpty
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import org.itson.tripsplit.R
 import org.itson.tripsplit.data.adapter.DeudaAdapter
 import org.itson.tripsplit.data.adapter.GastoAdapter
 import org.itson.tripsplit.data.model.Deuda
 import org.itson.tripsplit.data.repository.GrupoRepository
+import org.itson.tripsplit.data.repository.UserRepository
 import org.itson.tripsplit.databinding.FragmentReporteViajesBinding
 import org.itson.tripsplit.repository.GastoRepository
 
@@ -24,13 +27,20 @@ class ReporteViajesFragment : Fragment(R.layout.fragment_reporte_viajes) {
     private var _binding: FragmentReporteViajesBinding? = null
     private val binding get() = _binding!!
     private val gastosRepository=GastoRepository()
+    private val userRepository=UserRepository()
     private val gruposRepository = GrupoRepository()
-
+    val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+    private lateinit var btnBack: ImageButton
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentReporteViajesBinding.inflate(inflater, container, false)
+        btnBack = binding.root.findViewById(R.id.btnBack)
+        // Hacer que btnBack regrese al fragmento anterior
+        btnBack.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
         return binding.root
     }
 
@@ -77,18 +87,15 @@ class ReporteViajesFragment : Fragment(R.layout.fragment_reporte_viajes) {
                 if (deudas.isEmpty()) {
                     Toast.makeText(requireContext(), "No hay gastos registrados.", Toast.LENGTH_SHORT).show()
                 } else {
-                    val adapter = DeudaAdapter(requireContext(), deudas) { userId, callback ->
-                        FirebaseDatabase.getInstance().getReference("usuarios").child(userId)
-                            .get()
-                            .addOnSuccessListener {
-                                val nombre =
-                                    it.child("nombre").getValue(String::class.java) ?: "Desconocido"
-                                callback(nombre.split(" ")[0])
-                            }
+                    val idsUnicos = deudas.flatMap { listOf(it.deudor, it.acreedor) }.toSet().toList()
+
+                    userRepository.obtenerNombresUsuarios(idsUnicos) { mapaNombres: Map<String, String>->
+                        val adapter = DeudaAdapter(requireContext(), deudas, currentUid.toString(), mapaNombres)
+                        listDeudas.adapter = adapter
                     }
-                    listDeudas.adapter = adapter
                 }
             }
+
         }
         // Boton de la gráfica por categoría
         binding.btnGrafica.setOnClickListener {

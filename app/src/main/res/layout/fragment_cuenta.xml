@@ -11,12 +11,12 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="@dimen/activity_tittle_box_vertical"
         android:layout_margin="10dp"
         android:background="@drawable/gradient_title"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
+        android:paddingStart="30dp"
         android:paddingEnd="16dp">
 
         <TextView
@@ -24,7 +24,7 @@
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:fontFamily="@font/inter"
+            android:fontFamily="@font/karla_bold"
             android:paddingLeft="10dp"
             android:textColor="@android:color/white"
             android:textSize="32sp"

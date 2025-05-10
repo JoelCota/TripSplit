@@ -6,12 +6,14 @@ import androidx.annotation.RequiresApi
 import com.google.firebase.database.*
 import org.itson.tripsplit.data.model.Deuda
 import org.itson.tripsplit.data.model.Gasto
+import org.itson.tripsplit.data.repository.UserRepository
+import org.itson.tripsplit.utils.CurrencyUtils
 import java.util.UUID
 
 class GastoRepository {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
-
+    private val userRepository= UserRepository()
     fun agregarGasto(grupoId: String, gasto: Gasto, onComplete: (Boolean) -> Unit) {
         val gastoId = UUID.randomUUID().toString()
         val gastoConId = gasto.copy(id = gastoId)
@@ -101,7 +103,9 @@ class GastoRepository {
                 for (gastoSnap in snapshot.children) {
                     val gasto = gastoSnap.getValue(Gasto::class.java)
                     if (gasto != null) {
-                        total += gasto.cantidad
+                        val moneda=gasto.moneda
+                        val cantidadTotal = CurrencyUtils().toUsd(gasto.cantidad,moneda)
+                        total += cantidadTotal
                     }
                 }
                 callback(total)
@@ -123,7 +127,8 @@ class GastoRepository {
                     val gasto = gastoSnap.getValue(Gasto::class.java)
                     if (gasto != null) {
                         val participantes = gasto.divididoEntre.orEmpty()
-                        val cantidadTotal = gasto.cantidad
+                        val moneda=gasto.moneda
+                        val cantidadTotal = CurrencyUtils().toUsd(gasto.cantidad,moneda)
 
                         if (participantes.any { it.id == userId }) {
                             val cantidadPorPersona = cantidadTotal / participantes.size
@@ -153,12 +158,12 @@ class GastoRepository {
         dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val deudasMap = mutableMapOf<Pair<String, String>, Double>()
-
                 for (gastoSnap in snapshot.children) {
                     val gasto = gastoSnap.getValue(Gasto::class.java)
 
                     if (gasto != null) {
-                        val cantidadTotal = gasto.cantidad
+                        val moneda=gasto.moneda
+                        val cantidadTotal = CurrencyUtils().toUsd(gasto.cantidad,moneda)
                         val pagador = gasto.pagadoPor
                         val participantes = gasto.divididoEntre.orEmpty()
 
@@ -175,8 +180,29 @@ class GastoRepository {
                     }
                 }
 
-                val deudas = deudasMap.map { (clave, monto) ->
-                    Deuda(deudor = clave.first, acreedor = clave.second, monto = monto)
+                // Simplificar deudas bidireccionales
+                val deudasSimplificadas = mutableMapOf<Pair<String, String>, Double>()
+
+                for ((clave, monto) in deudasMap) {
+                    val inversa = Pair(clave.second, clave.first)
+                    if (deudasSimplificadas.containsKey(inversa)) {
+                        val montoInverso = deudasSimplificadas[inversa]!!
+                        val diferencia = montoInverso - monto
+                        if (diferencia > 0) {
+                            deudasSimplificadas[inversa] = diferencia
+                        } else if (diferencia < 0) {
+                            deudasSimplificadas.remove(inversa)
+                            deudasSimplificadas[clave] = -diferencia
+                        } else {
+                            deudasSimplificadas.remove(inversa)
+                        }
+                    } else {
+                        deudasSimplificadas[clave] = monto
+                    }
+                }
+
+                val deudas = deudasSimplificadas.map { (clave, monto) ->
+                    Deuda(deudor = clave.first, acreedor = clave.second, monto = monto,moneda="USD")
                 }
 
                 callback(deudas)
@@ -188,6 +214,59 @@ class GastoRepository {
         })
     }
 
+    fun calcularDeudasPorIdGasto(grupoId: String, gastoId: String, callback: (List<Deuda>) -> Unit) {
+        val dbRef = FirebaseDatabase.getInstance().getReference("gastosPorGrupo").child(grupoId).child(gastoId)
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val deudasMap = mutableMapOf<Pair<String, String>, Double>()
+                val gasto = snapshot.getValue(Gasto::class.java) // Asumiendo que 'Gasto' es tu clase de datos
+
+                if (gasto != null) {
+                    Log.d("Deuda", "Gasto encontrado: $gasto")
+                    val cantidadTotal =gasto.cantidad
+                    val pagador = gasto.pagadoPor
+                    val participantes = gasto.divididoEntre.orEmpty()
+
+                    if (pagador != null && participantes.isNotEmpty()) {
+                        val cantidadPorPersona = cantidadTotal / participantes.size
+                        Log.d("Deuda", "Cantidad total: $cantidadTotal, Cantidad por persona: $cantidadPorPersona")
+
+                        for (usuario in participantes) {
+                            if (usuario.id != pagador.id) {
+                                val clave = Pair(usuario.id, pagador.id)
+                                deudasMap[clave] = (deudasMap[clave] ?: 0.0) + cantidadPorPersona
+                                Log.d("Deuda", "Deuda para ${usuario.id}: ${deudasMap[clave]}")
+                            }
+                        }
+                    }
+
+                    // Convertir el mapa de deudas a una lista de objetos 'Deuda'
+                    val deudasList = deudasMap.map { (key, value) ->
+                        Deuda(deudor = key.first, acreedor = key.second, monto = value,moneda=gasto.moneda)
+                    }
+
+                    // Log de la lista de deudas
+                    Log.d("Deuda", "Deudas calculadas: $deudasList")
+
+                    // Calculamos el total de las deudas para pasar al callback
+                    val totalDeuda = deudasList.sumByDouble { it.monto }
+                    Log.d("Deuda", "Total deuda: $totalDeuda")
+
+                    // Llamamos al callback con el total y la lista de deudas
+                    callback(deudasList)
+                } else {
+                    Log.d("Deuda", "No se encontró el gasto")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Error al leer el gasto: ${error.message}")
+            }
+        })
+    }
+
+
+
     fun calcularCreditoUsuario(grupoId: String, idUsuario: String, callback: (Double) -> Unit) {
         val gastosRef = database.child("gastosPorGrupo").child(grupoId)
         gastosRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -195,7 +274,6 @@ class GastoRepository {
                 var totalACobrar = 0.0
                 for (gastoSnap in snapshot.children) {
                     val gasto = gastoSnap.getValue(Gasto::class.java)
-                    val pagadorId = gasto?.pagadoPor?.id
                     val participantes = gasto?.divididoEntre.orEmpty()
                     Log.d("GastoCredito Inicio", gastoSnap.toString())
                     if (gasto != null && participantes.size > 1) {

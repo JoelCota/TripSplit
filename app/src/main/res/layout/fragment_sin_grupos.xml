@@ -16,28 +16,16 @@
         android:layout_margin="10dp"
         android:orientation="horizontal"
         android:background="@drawable/gradient_title"
-        android:gravity="center_vertical">
+        android:gravity="center">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/inter"
             android:text="Mis grupos"
+            android:fontFamily="@font/karla_bold"
             android:textColor="@android:color/white"
             android:textSize="@dimen/title_font_size"
-            android:textStyle="bold"
-            android:layout_marginLeft="40dp"/>
-
-        <!-- Espaciador flexible -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-
-        <ImageView
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:layout_marginRight="75dp"/>
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Contenido principal -->

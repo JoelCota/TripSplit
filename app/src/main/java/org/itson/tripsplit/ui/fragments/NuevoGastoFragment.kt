@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -27,7 +28,6 @@ import kotlin.math.log
 
 class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelectedListener {
 
-    private lateinit var spinner: Spinner
     private lateinit var txtPagadoPor: TextView
     private lateinit var txtDivididoEntre: TextView
     private lateinit var txtMoneda: TextView
@@ -37,12 +37,10 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
     private lateinit var btnSetCurrency: Button
     private lateinit var btnCategories: Button
     private lateinit var btnGuardar: Button
+    private lateinit var btnBack: ImageButton
     private val grupoRepository = GrupoRepository()
     private val gastoRepository = GastoRepository()
     private val usuarioRepository = UserRepository()
-    private lateinit var spinnerCategoria: Spinner
-    private lateinit var spinnerMoneda: Spinner
-    val currencyUtils=CurrencyUtils()
     private var categorySelected : String = ""
     private lateinit var paidBy : Usuario
     private var monedaSeleccionada: String = ""
@@ -66,6 +64,7 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
         btnGuardar= rootView.findViewById(R.id.btnGuardar)
         btnSetCurrency = rootView.findViewById(R.id.btnSelectCurrency)
         btnCategories = rootView.findViewById(R.id.btnSelectCategory)
+        btnBack = rootView.findViewById(R.id.btnBack)
 
         grupoRepository.obtenerUsuariosDeGrupo(
             grupoId = grupoId ,
@@ -86,6 +85,9 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
             }
         )
         }
+        btnBack.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
 
         // Click en "Pagado por"
         txtPagadoPor.setOnClickListener {
@@ -97,6 +99,18 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
         txtDivididoEntre.setOnClickListener {
             val dialogMultiple = MiembrosDialogFragment.newInstance(miembros, "multiple")
             dialogMultiple.show(parentFragmentManager, "MiembrosDialogFragment")
+        }
+
+        btnSetCurrency.setOnClickListener {
+            val dialog =
+                ListaSeleccionDialogFragment.newInstance(monedas, "Seleccionar Moneda",this)
+            dialog.show(parentFragmentManager, "currencyDialog")
+        }
+
+        btnCategories.setOnClickListener {
+            val dialog =
+                ListaSeleccionDialogFragment.newInstance(categorias, "Seleccionar Categoría", this)
+            dialog.show(parentFragmentManager, "categoryDialog")
         }
 
         txtMoneda.setOnClickListener {
@@ -113,7 +127,7 @@ class NuevoGastoFragment : Fragment(), ListaSeleccionDialogFragment.OnItemSelect
                 val gasto = Gasto(
                     nombre = edtNombre.text.toString(),
                     categoria = categorySelected,
-                    cantidad = currencyUtils.toUsdWithTwoDecimals(cantidad,monedaSeleccionada),
+                    cantidad = cantidad,
                     moneda=monedaSeleccionada,
                     fecha = sdf.format(Date()),
                     pagadoPor = paidBy,

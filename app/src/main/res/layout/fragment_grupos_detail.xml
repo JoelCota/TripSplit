@@ -40,6 +40,7 @@
                 android:layout_weight="1"
                 android:gravity="left|clip_horizontal"
                 android:text=""
+                android:fontFamily="@font/karla_bold"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/title_font_size"
                 android:textStyle="bold" />
@@ -160,7 +161,9 @@
             <ListView
                 android:id="@+id/listGastos"
                 android:layout_width="match_parent"
-                android:layout_height="350dp"/>
+                android:layout_height="350dp"
+                android:paddingBottom="30dp"
+                />
         </LinearLayout>
     </LinearLayout>
 

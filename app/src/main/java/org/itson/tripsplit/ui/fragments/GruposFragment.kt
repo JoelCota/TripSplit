@@ -22,7 +22,6 @@ class GruposFragment : Fragment() {
     private lateinit var binding: FragmentGruposBinding
     private val userRepository = UserRepository()
     private val gastoRepository = GastoRepository()
-    private val grupoRepository = GrupoRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +44,7 @@ class GruposFragment : Fragment() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         userRepository.getUserGroups(userId) { grupos ->
             if (grupos.isEmpty()) {
-                Toast.makeText(context, "No hay grupos disponibles", Toast.LENGTH_SHORT).show()
+                Log.d("GruposFragment", "No hay grupos disponibles")
             } else {
                 mostrarGrupos(grupos)
             }
@@ -66,19 +65,14 @@ class GruposFragment : Fragment() {
             gastoRepository.obtenerTotalGastado(grupo.id){total->
                 groupDescriptionTextView.text = "Total: $${"%.2f".format(total)}"
             }
-
-
             gastoRepository.calcularCreditoUsuario(grupo.id,userId){totalCobrar->
-                println(totalCobrar)
-                gastosTextView.text="Te deben $${totalCobrar} "
+                gastosTextView.text="Te deben $${"%.2f".format(totalCobrar)} "
             }
 
             groupView.setOnClickListener {
                 val bundle = Bundle().apply {
                     putString("grupoId", grupo.id)
                 }
-
-
 
                 val detalleFragment = GruposDetailFragment().apply {
                     arguments = bundle
