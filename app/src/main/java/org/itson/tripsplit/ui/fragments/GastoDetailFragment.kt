@@ -1,5 +1,6 @@
 package org.itson.tripsplit.ui.fragments
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ import android.widget.ListView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -23,6 +25,7 @@ import org.itson.tripsplit.R
 import org.itson.tripsplit.data.adapter.DeudaAdapter
 import org.itson.tripsplit.data.model.Gasto
 import org.itson.tripsplit.data.model.Usuario
+import org.itson.tripsplit.data.repository.GrupoRepository
 import org.itson.tripsplit.data.repository.UserRepository
 import org.itson.tripsplit.repository.GastoRepository
 
@@ -35,6 +38,8 @@ class GastoDetailFragment : Fragment() {
     private lateinit var btnEditar: ImageButton
     private lateinit var listaResumenDeudas: ListView
     private val userRepository=UserRepository()
+    private val grupoRepository= GrupoRepository()
+    private val gastoRepository= GastoRepository()
     val usuarioActual = FirebaseAuth.getInstance().currentUser?.uid
 
     override fun onCreateView(
@@ -59,7 +64,10 @@ class GastoDetailFragment : Fragment() {
         val grupoId = arguments?.getString("grupoId") ?: return
         val gastoId = arguments?.getString("gastoId") ?: return
         val gastoRepo = GastoRepository()
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
+        drawable?.setTint(ContextCompat.getColor(requireContext(), android.R.color.black))
         btnEliminar = view.findViewById(R.id.btnDeleteGroup)
+        btnEliminar.setImageDrawable(drawable)
         btnEditar = view.findViewById(R.id.btnEditGroup)
 
         btnEliminar.setOnClickListener {
@@ -73,7 +81,7 @@ class GastoDetailFragment : Fragment() {
                 gastoRepo.obtenerGastos(grupoId) { gastos ->
                     val gasto = gastos.find { it.id == gastoId }
                     if (gasto != null) {
-                        cargarUsuariosDelGrupo(grupoId) { listaUsuarios ->
+                        grupoRepository.obtenerUsuariosDeGrupo(grupoId) { listaUsuarios ->
                             mostrarDialogoEditarGasto(grupoId, gasto, listaUsuarios)
                         }
                     } else {
@@ -124,22 +132,16 @@ class GastoDetailFragment : Fragment() {
             .setTitle("Eliminar gasto")
             .setMessage("¿Estás seguro de eliminar este gasto?")
             .setPositiveButton("Eliminar") { _, _ ->
-                eliminarGastoDeGrupo(grupoId, gastoId)
+                gastoRepository.eliminarGasto(grupoId, gastoId){
+                   onComplete-> Log.d("GastoEdit","Gasto eliminado con exito")
+                  parentFragmentManager.popBackStack()
+
+                }
             }
             .setNegativeButton("Cancelar", null)
             .show()
     }
 
-    private fun eliminarGastoDeGrupo(grupoId: String, gastoId: String) {
-        val ref = FirebaseDatabase.getInstance().getReference("gastosPorGrupo").child(grupoId).child(gastoId)
-
-        ref.removeValue().addOnSuccessListener {
-            Toast.makeText(requireContext(), "Gasto eliminado", Toast.LENGTH_SHORT).show()
-            requireActivity().onBackPressed()
-        }.addOnFailureListener {
-            Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show()
-        }
-    }
 
     private fun mostrarDialogoEditarGasto(grupoId: String, gastoOriginal: Gasto, listaUsuarios: List<Usuario>) {
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_editar_gasto, null)
@@ -147,21 +149,27 @@ class GastoDetailFragment : Fragment() {
         val inputNombre = view.findViewById<EditText>(R.id.editTextNombreGasto)
         val inputCantidad = view.findViewById<EditText>(R.id.editTextCantidadGasto)
         val spinnerPagadoPor = view.findViewById<Spinner>(R.id.spinnerPagadoPor)
+        val spinnerMoneda = view.findViewById<Spinner>(R.id.spinnerMoneda)
         val spinnerCategoria = view.findViewById<Spinner>(R.id.spinnerCategoria)
-        val selectorDivididoEntre = view.findViewById<TextView>(R.id.selectorDivididoEntre)
-
+        val selectorDivididoEntre=view.findViewById<TextView>(R.id.txtDivididoEntre)
         inputNombre.setText(gastoOriginal.nombre)
         inputCantidad.setText(gastoOriginal.cantidad.toString())
 
-        // Spinner de categoría
         val categorias = listOf("General", "Comida", "Transporte", "Hospedaje", "Ocio")
+        val monedas = arrayOf("USD", "MXN", "EUR")
+        //Lleando spinnerCategorias
         val adapterCategorias = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categorias)
         adapterCategorias.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategoria.adapter = adapterCategorias
         val indexCategoria = categorias.indexOf(gastoOriginal.categoria)
         if (indexCategoria >= 0) spinnerCategoria.setSelection(indexCategoria)
+        //Lleando spinerMonedas
+        val adapterMonedas = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, monedas)
+        adapterMonedas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerMoneda.adapter = adapterMonedas
+        val indexMoneda = monedas.indexOf(gastoOriginal.moneda)
+        if (indexMoneda >= 0) spinnerMoneda.setSelection(indexMoneda)
 
-        // Spinner de quien pagó
         val nombresUsuarios = listaUsuarios.map { it.nombre }
         val adapterUsuarios = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, nombresUsuarios)
         adapterUsuarios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -169,17 +177,19 @@ class GastoDetailFragment : Fragment() {
         val indexPagadoPor = nombresUsuarios.indexOf(gastoOriginal.pagadoPor?.nombre)
         if (indexPagadoPor >= 0) spinnerPagadoPor.setSelection(indexPagadoPor)
 
-        // Selección múltiple para "dividido entre"
         val seleccionados = BooleanArray(listaUsuarios.size) { i ->
             gastoOriginal.divididoEntre.any { it.nombre == listaUsuarios[i].nombre }
         }
         val seleccionadosTemp = mutableListOf<Usuario>().apply {
             addAll(gastoOriginal.divididoEntre)
         }
-
         fun actualizarTextoSeleccionados() {
-            val texto = seleccionadosTemp.joinToString(", ") { it.nombre }
-            selectorDivididoEntre.text = if (texto.isNotEmpty()) texto else "Usuarios que comparten"
+            val texto = if (seleccionadosTemp.isEmpty()) {
+                "Seleccionar usuarios"
+            } else {
+                seleccionadosTemp.joinToString(", ") { it.nombre }
+            }
+            selectorDivididoEntre.text = texto
         }
         actualizarTextoSeleccionados()
 
@@ -200,8 +210,6 @@ class GastoDetailFragment : Fragment() {
                 .setNegativeButton("Cancelar", null)
                 .show()
         }
-
-        // Confirmar cambios
         AlertDialog.Builder(requireContext())
             .setTitle("Editar gasto")
             .setView(view)
@@ -209,6 +217,7 @@ class GastoDetailFragment : Fragment() {
                 val nuevoNombre = inputNombre.text.toString()
                 val nuevaCantidad = inputCantidad.text.toString().toDoubleOrNull()
                 val nuevaCategoria = spinnerCategoria.selectedItem.toString()
+                val nuevaMoneda = spinnerMoneda.selectedItem.toString()
                 val nombrePagadoPor = spinnerPagadoPor.selectedItem.toString()
                 val pagadoPor = listaUsuarios.find { it.nombre == nombrePagadoPor }
 
@@ -217,6 +226,7 @@ class GastoDetailFragment : Fragment() {
                         nombre = nuevoNombre,
                         cantidad = nuevaCantidad,
                         categoria = nuevaCategoria,
+                        moneda = nuevaMoneda,
                         pagadoPor = pagadoPor,
                         divididoEntre = seleccionadosTemp.toList()
                     )
@@ -237,28 +247,5 @@ class GastoDetailFragment : Fragment() {
             .setNegativeButton("Cancelar", null)
             .create()
             .show()
-    }
-
-
-
-
-
-    private fun cargarUsuariosDelGrupo(grupoId: String, callback: (List<Usuario>) -> Unit) {
-        val usuariosRef = FirebaseDatabase.getInstance().getReference("usuarios").child(grupoId)
-
-        usuariosRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val listaUsuarios = mutableListOf<Usuario>()
-                for (userSnapshot in snapshot.children) {
-                    val usuario = userSnapshot.getValue(Usuario::class.java)
-                    usuario?.let { listaUsuarios.add(it) }
-                }
-                callback(listaUsuarios)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                callback(emptyList())
-            }
-        })
     }
 }

@@ -95,8 +95,7 @@
             android:layout_height="40dp"
             android:visibility="invisible"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Eliminar Gasto"
-            android:src="@drawable/ic_delete" />
+            android:contentDescription="Eliminar Gasto"/>
 
         <ImageButton
             android:id="@+id/btnEditGroup"

@@ -16,6 +16,7 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import androidx.navigation.fragment.findNavController
@@ -39,15 +40,8 @@ class EditarGrupoFragment : Fragment() {
     private lateinit var txtCopyLink: TextView
     private lateinit var btnBack: ImageButton
     private lateinit var btnEliminarGrupo: ImageButton
-    private val listaUsers: MutableList<Usuario> = mutableListOf()
     private lateinit var contenedorUsuarios: LinearLayout
-    private lateinit var idCreadorDelGrupo: String
-
     private lateinit var groupId: String
-    private val grupoRepository = GrupoRepository()
-    private val userRepository = UserRepository()
-    private val databaseRef = FirebaseDatabase.getInstance().getReference("grupos")
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -60,7 +54,9 @@ class EditarGrupoFragment : Fragment() {
         btnEditTitle = view.findViewById(R.id.btnEditGroup)
         txtCopyLink = view.findViewById(R.id.txtCopyLink)
         btnEliminarGrupo = view.findViewById(R.id.btnDeleteGroup)
-
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
+        drawable?.setTint(ContextCompat.getColor(requireContext(), android.R.color.white))
+        btnEliminarGrupo.setImageDrawable(drawable)
 
         // Lógica para editar el título
         txtTripTitle.setOnClickListener() {
@@ -72,7 +68,7 @@ class EditarGrupoFragment : Fragment() {
         }
         // Lógica para copiar el enlace
         txtCopyLink.setOnClickListener {
-            copyLinkToClipboard("http://example.com") // Cambia con el enlace real
+            copyLinkToClipboard(groupId) // Cambia con el enlace real
         }
         btnEditTitle.setOnClickListener {
             val grupoId = arguments?.getString("grupoId")
@@ -129,11 +125,6 @@ class EditarGrupoFragment : Fragment() {
                 txtTripTitle.text = nombreGrupo
             }
         }
-
-        val txtCopyLink = view.findViewById<TextView>(R.id.txtCopyLink)
-        txtCopyLink.setOnClickListener {
-            onCopyLinkClick(it)
-        }
     }
     private fun irAGruposFragment() {
         val fragmentManager = requireActivity().supportFragmentManager
@@ -143,19 +134,6 @@ class EditarGrupoFragment : Fragment() {
         transaction.replace(R.id.fragmentContainer, GruposFragment())
         transaction.addToBackStack(null) // Opcional: permite volver atrás
         transaction.commit()
-    }
-
-    fun onCopyLinkClick(view: View) {
-        val grupoId = arguments?.getString("grupoId") ?: run {
-            Toast.makeText(requireContext(), "No hay ID de grupo", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("ID del Grupo", grupoId)
-
-        clipboard.setPrimaryClip(clip)
-        Toast.makeText(requireContext(), "ID copiado: $grupoId", Toast.LENGTH_SHORT).show()
     }
 
     private fun cargarAvatarUsuario(userId: String, imageView: ImageView) {
@@ -199,8 +177,10 @@ class EditarGrupoFragment : Fragment() {
                     val imgAvatarUser = vistaMiembro.findViewById<ImageView>(R.id.imgAvatarUser)
 
                     txtNombre.text = usuario.nombre
-
+                    val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
+                    drawable?.setTint(ContextCompat.getColor(requireContext(), android.R.color.black))
                     // Mostrar el botón solo si es el creador
+                    btnEliminar.setImageDrawable(drawable)
                     btnEliminar.visibility = if (esCreador) View.VISIBLE else View.GONE
 
                     btnEliminar.setOnClickListener {
@@ -312,7 +292,6 @@ class EditarGrupoFragment : Fragment() {
         showToast("Enlace copiado")
     }
 
-    // Mostrar un Toast (mensaje)
     private fun showToast(message: String) {
         android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
     }

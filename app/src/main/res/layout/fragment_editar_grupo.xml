@@ -55,8 +55,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Eliminar miembro"
-                android:src="@android:drawable/ic_menu_delete" />
+                android:contentDescription="Eliminar miembro"/>
 
         </LinearLayout>
     </LinearLayout>

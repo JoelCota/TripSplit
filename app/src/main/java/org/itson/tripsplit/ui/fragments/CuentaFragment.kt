@@ -42,6 +42,7 @@ class CuentaFragment : Fragment() {
         userRepository = UserRepository()
 
         val btnLogout: Button = rootView.findViewById(R.id.btnCerrarSesion)
+
         imgAvatar = rootView.findViewById(R.id.imgAvatar)
         btnLogout.setOnClickListener {
             userRepository.cerrarSesion()
